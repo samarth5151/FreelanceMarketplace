@@ -1,0 +1,144 @@
+
+.steps-section {
+    text-align: center;
+    padding: 130px 20px;
+    background-color:whitesmoke;
+}
+
+.steps-section h2 {
+    color: rgb(32 159 75);
+    font-size: 21px;
+    margin-bottom: 10px;
+}
+
+.steps-section h1 {
+    font-size: 36px;
+    margin-bottom: 40px;
+    color: rgba(0, 0, 0, 0.644);
+}
+
+.steps-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.step {
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 20px;
+    width: 22%;
+    min-width: 250px;
+    text-align: left;
+}
+
+.step-number {
+    font-size: 60px;
+    color: rgb(32 159 75);
+    margin-bottom: 15px;
+    
+}
+
+h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(0, 0, 0, 0.644);
+}
+
+.btn21-con{
+    display: flex;
+    justify-content: center;
+    margin-top: 70px;
+    padding-bottom: 80px;
+
+}
+/* Button style */
+.btn21,
+.btn21 *,
+.btn21 :after,
+.btn21 :before,
+.btn21:after,
+.btn21:before {
+border: 0 solid;
+box-sizing: border-box;
+}
+.btn21 {
+-webkit-tap-highlight-color: 
+transparent;
+-webkit-appearance: button;
+background-color: 
+#eee;
+background-image: none;
+color: 
+#fff;
+cursor: pointer;
+font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+font-size: 100%;
+line-height: 1;
+margin: 0;
+-webkit-mask-image: -webkit-radial-gradient(#000, #fff);
+padding: 0;
+}
+.btn21:disabled {
+cursor: default;
+}
+.btn21:-moz-focusring {
+outline: auto;
+}
+.btn21 svg {
+display: block;
+vertical-align: middle;
+}
+.btn21 [hidden] {
+display: none;
+}
+.btn21 {
+border: none;
+border-radius: 999px;
+box-sizing: border-box;
+display: block;
+font-weight: 700;
+overflow: hidden;
+padding: 1rem 3.2rem;
+position: relative;
+}
+.btn21:before {
+--opacity: 0.2;
+aspect-ratio: 1;
+background: 
+rgba(0, 0, 0, 0.644);
+border-radius: 50%;
+content: "";
+left: 50%;
+opacity: var(--opacity);
+position: absolute;
+top: 50%;
+transform: translate(-50%, -50%) scale(0);
+width: 100%;
+z-index: -1;
+}
+.btn21:hover:before {
+-webkit-animation: enlarge 1s forwards;
+animation: enlarge 1s forwards;
+}
+
+@-webkit-keyframes enlarge {
+to {
+opacity: 0;
+transform: translate(-50%, -50%) scale(4);
+}
+}
+@keyframes enlarge {
+to {
+opacity: 0;
+transform: translate(-50%, -50%) scale(4);
+}
+}

@@ -1,0 +1,11 @@
+.footer1 a{
+    color: rgb(192, 192, 192);
+    font-size: 15px;
+
+
+}
+
+.footer1 a:hover{
+    color:rgb(32 159 75);
+    transition: 0.7s;
+}
