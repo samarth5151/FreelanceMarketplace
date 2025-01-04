@@ -29,10 +29,10 @@
         </ul>
         <div class="nav-btns">
            
-        <a href="PHP Files/login.php">
+        <a href="PHPUIFiles/login.php">
                <button href="#"  class="btn70" style="margin-right: 15px;">Login</button>
             </a>
-            <a href="PHP files/register.php">
+            <a href="PHPUIFiles/register.php">
                <button class="btn-71" style="margin-right: 15px;">Register</button>
             </a>
 

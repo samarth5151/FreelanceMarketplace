@@ -42,12 +42,14 @@
             font-size: 13px;
             border: 1px solid #555;
             border-radius: 5px;
-            background-color: transparent;
-            color: white;
+            color: black;
             margin-bottom: 10px;
+            
         }
         input[type="checkbox"] {
             margin-right: 10px;
+            color: white;
+            background-color: #fff;
         }
         .checkbox-group {
             display: flex;
@@ -100,7 +102,7 @@
 
 <div class="container" id="mainForm">
     <h2>Create an Account</h2>
-    <form action="your_register_backend_script.php" method="POST" id="registrationForm">
+    <form action="users_store.php" method="POST" id="registrationForm">
 
         <!-- Personal Details -->
         <div class="form-row">
@@ -164,8 +166,8 @@
 
         <!-- User Type Selection -->
         <div class="checkbox-group">
-            <label><input type="radio" name="usertype" value="Client"> Client </label>
-            <label><input type="radio" name="usertype" value="freelancer" id="freelancer"> Freelancer</label>
+        <label><input type="radio" name="usertype" value="Client" id="client"> Client</label>
+        <label><input type="radio" name="usertype" value="freelancer" id="freelancer"> Freelancer</label>
 
         </div>
 
@@ -177,7 +179,7 @@
 <!-- Developer Forms (hidden initially) -->
 <div class="container hidden" id="developerForm1">
     <h2>Professional Expertise (Form 1)</h2>
-    <form action="your_register_backend_script.php" method="POST">
+    <form action="freelancers_store.php" method="POST">
         <div class="form-row">
             <div class="form-group">
                 <label for="skills">Specialized Skills</label>
@@ -271,7 +273,7 @@
             }, 500);
         } else if (document.getElementById('client').checked) {
             // If 'Client' is selected, submit the form to client_store.php
-            this.action = "client_store.php"; // Set the action attribute to client_store.php
+            this.action = "users_store.php";
             this.method = "POST"; // Ensure the form uses POST
             this.submit(); // Submit the form
         }
