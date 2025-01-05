@@ -102,7 +102,7 @@
 
 <div class="container" id="mainForm">
     <h2>Create an Account</h2>
-    <form action="users_store.php" method="POST" id="registrationForm">
+    <form action="users_store.php" method="POST" id="registrationForm" enctype="multipart/form-data">
 
         <!-- Personal Details -->
         <div class="form-row">
@@ -163,6 +163,7 @@
                 <input type="file" name="profile" id="profile">           
             </div>
         </div>
+        
 
         <!-- User Type Selection -->
         <div class="checkbox-group">
@@ -256,31 +257,41 @@
         <button type="submit">Submit</button>
     </form>
 </div>
-
 <script>
-    // Handle form submission for 'Freelancer' and 'Client'
-    document.getElementById('registrationForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent form submission
+    // Helper to toggle visibility with animations
+    function toggleVisibility(hideId, showId) {
+        const hideElement = document.getElementById(hideId);
+        const showElement = document.getElementById(showId);
+        hideElement.classList.add('fade-out');
+        setTimeout(() => {
+            hideElement.classList.add('hidden');
+            hideElement.setAttribute('aria-hidden', 'true');
+            showElement.classList.remove('hidden');
+            showElement.classList.add('fade-in');
+            showElement.setAttribute('aria-hidden', 'false');
+        }, 500); // Adjust this based on CSS animation timing
+    }
 
-        // Check if 'Freelancer' is selected
+    // Main form submission
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
         if (document.getElementById('freelancer').checked) {
-            // Fade out the main form and go to freelancer-specific forms
-            document.getElementById('mainForm').classList.add('fade-out');
-            setTimeout(function() {
-                document.getElementById('mainForm').classList.add('hidden');
-                document.getElementById('developerForm1').classList.remove('hidden');
-                document.getElementById('developerForm1').classList.add('fade-in');
-            }, 500);
-        } else if (document.getElementById('client').checked) {
-            // If 'Client' is selected, submit the form to client_store.php
+            toggleVisibility('mainForm', 'developerForm1');
+        } else {
             this.action = "users_store.php";
-            this.method = "POST"; // Ensure the form uses POST
-            this.submit(); // Submit the form
+            this.method = "POST";
+            this.submit();
+
+
         }
     });
+
+    // Developer form 1 submission
+    document.getElementById('developerForm1Form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        toggleVisibility('developerForm1', 'developerForm2');
+    });
 </script>
-
-
 
 </body>
 </html>

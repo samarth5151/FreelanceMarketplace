@@ -3,8 +3,9 @@
 include('../Connection/connection.php');
 
 session_start();   
-if(isset($_SESSION["Username"])){
-    $username=$_SESSION["Username"];
+if(isset($_SESSION["username"])){
+    $username=$_SESSION["username"];
+
 }
 else{
     // $username="samarth50";
@@ -29,6 +30,7 @@ if ($row = $result->fetchArray(SQLITE3_ASSOC)) {
      $contactNo = $row["users_contact"];
      $gender = $row["users_gender"];
      $birthdate = $row["users_dob"];
+     $profilepath = $row["users_profile_img"];
     $address="";
 } else {
     echo "0 results";
@@ -384,7 +386,7 @@ margin-right: 10px;
         <!--Main profile card-->
         <div class="card" style="padding:20px 20px 5px 20px;margin-top:20px">
             <p></p>
-            <img src="image/img04.jpg">
+            <img src="<?php $profilepath ?>" alt="Profile Image">
             <h2><?php echo $name; ?></h2>
             <p><span class="glyphicon glyphicon-user"></span> <?php echo $username; ?></p>
             <ul>
