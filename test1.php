@@ -1,53 +1,3 @@
-<?php
-
-session_start();
-
-$db = new SQLite3('C:\xampp\htdocs\MegaProject\Connection\Freelance_db.db');
-
-if (!$db) {
-    die("Database connection failed: " . $db->lastErrorMsg());
-}
-
-
-if(isset($_SESSION["username"])){
-	$username=$_SESSION["username"];
-}
-else{
-	// $username="atharv30";
-  $username="";
-	//header("location: index.php");
-}
-
-// if(isset($_POST["jid"])){
-// 	$_SESSION["job_id"]=$_POST["jid"];
-// 	header("location: jobDetails.php");
-// }
-
-// if(isset($_POST["f_user"])){
-// 	$_SESSION["f_user"]=$_POST["f_user"];
-// 	header("location: viewFreelancer.php");
-// }
-
-// Assuming $conn is the SQLite3 connection object
-$sql = "SELECT * FROM users WHERE username='$username'";
-$result = $db->query($sql);
-if ($result) {
-    // Fetch data as associative array
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-        $username = $row["username"];
-        $users_name = $row["users_name"];
-        $email = $row["users_email"];
-        $contact = $row["users_contact"];
-        $gender = $row["users_gender"];
-        $dob = $row["users_dob"];
-        $profile_path = $row["users_profile_img"];
-    }
-} else {
-    echo "0 results";
-}
-
-
- ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,6 +69,7 @@ if ($result) {
         padding: 10px 25px;
         border-radius: 5px;
         cursor: pointer;
+
         }
         .sidebar a:hover {
             background-color:rgb(231, 231, 231);
@@ -167,13 +118,12 @@ if ($result) {
 <!-- Sidebar -->
 <div class="sidebar">
     <div class="profile-card">
-        <img src="./profile_uploads/677f9e9590c64_WhatsApp Image 2025-01-06 at 22.48.08_3fa65505.jpg" alt="User Profile">
-        <h5><?php echo $username  ?></h5>
-        <p id="p1"> <span>Name:</span><?php echo $users_name  ?></p>
-        <p > <span>Email:</span><?php echo $email  ?></p>
-        <p> <span>  Mobile:</span>  <?php echo $contact  ?></p>
-        <p><span>Gender:</span>  <?php echo $gender  ?></p>
-        <p><span>DOB: </span> <?php echo $dob  ?></p>
+        <img src="https://via.placeholder.com/100" alt="User Profile">
+        <h5>User Name</h5>
+        <p id="p1"> <span>Email:</span> user@example.com</p>
+        <p> <span>  Mobile:</span>  +1234567890</p>
+        <p><span>Gender:</span>  Male</p>
+        <p><span>DOB: </span> 01/01/1990</p>
 
         <a href="#edit" id="edit">Edit Profile</a>
     </div>
@@ -185,7 +135,7 @@ if ($result) {
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img style="width:150px;" src="../Assets/logo2.png" alt=""></a>
+            <a class="navbar-brand" href="#"><img style="width:150px;" src="./Assets/logo2.png" alt=""></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -202,7 +152,7 @@ if ($result) {
 
     <!-- Overview Panel -->
     <div class="overview-panel">
-        <h2>Welcome, <?php echo $users_name; ?>!</h2>
+        <h2>Welcome, [User's Name]!</h2>
         <p>Here's a summary of your activity:</p>
         <div class="row">
             <div class="col-md-3">

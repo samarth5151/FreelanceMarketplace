@@ -216,7 +216,7 @@
 
 <div class="container hidden" id="developerForm2">
     <h2>Developer Details (Form 2)</h2>
-    <form action="your_register_backend_script.php" method="POST">
+    <form action="your_register_backend_script.php" method="POST"  enctype="multipart/form-data" autocomplete="on">
         <div class="form-row">
             <div class="form-group">
                 <label for="languages">Languages Spoken</label>
@@ -258,40 +258,101 @@
     </form>
 </div>
 <script>
-    // Helper to toggle visibility with animations
-    function toggleVisibility(hideId, showId) {
-        const hideElement = document.getElementById(hideId);
-        const showElement = document.getElementById(showId);
-        hideElement.classList.add('fade-out');
-        setTimeout(() => {
-            hideElement.classList.add('hidden');
-            hideElement.setAttribute('aria-hidden', 'true');
-            showElement.classList.remove('hidden');
-            showElement.classList.add('fade-in');
-            showElement.setAttribute('aria-hidden', 'false');
-        }, 500); // Adjust this based on CSS animation timing
+   // Helper to toggle visibility with animations
+function toggleVisibility(hideId, showId) {
+    const hideElement = document.getElementById(hideId);
+    const showElement = document.getElementById(showId);
+    hideElement.classList.add('fade-out');
+    setTimeout(() => {
+        hideElement.classList.add('hidden');
+        hideElement.setAttribute('aria-hidden', 'true');
+        showElement.classList.remove('hidden');
+        showElement.classList.add('fade-in');
+        showElement.setAttribute('aria-hidden', 'false');
+    }, 500); // Adjust this based on CSS animation timing
+}
+
+// Collect data from all forms and submit to freelancer_store.php
+function collectFormData() {
+    const mainForm = document.getElementById('registrationForm');
+    const freelancerForm1 = document.getElementById('developerForm1');
+    const freelancerForm2 = document.getElementById('developerForm2');
+
+    // Get data from the main form
+    const mainFormData = new FormData(mainForm);
+
+    // Get data from the freelancer form 1
+    const freelancerForm1Data = new FormData(freelancerForm1);
+
+    // Get data from the freelancer form 2
+    const freelancerForm2Data = new FormData(freelancerForm2);
+
+    // Combine all data into one object
+    const allData = new FormData();
+
+    // Append data from all forms
+    mainFormData.forEach((value, key) => {
+        allData.append(key, value);
+    });
+    freelancerForm1Data.forEach((value, key) => {
+        allData.append(key, value);
+    });
+    freelancerForm2Data.forEach((value, key) => {
+        allData.append(key, value);
+    });
+
+    return allData;
+}
+
+// Main form submission
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (document.getElementById('freelancer').checked) {
+        // Show the first freelancer form when 'Freelancer' is selected
+        toggleVisibility('mainForm', 'developerForm1');
+    } else {
+        // Submit the form if the user is a client
+        this.action = "users_store.php"; // Client registration
+        this.method = "POST";
+        this.submit();
+    }
+});
+
+// Developer form 1 submission
+document.getElementById('developerForm1').addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Show the second freelancer form after the first form is filled
+    toggleVisibility('developerForm1', 'developerForm2');
+});
+
+
+// Developer form 2 submission
+document.getElementById('developerForm2').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Collect all the data from the forms
+    const allData = collectFormData();
+
+    // Create a new form to submit the data to 'freelancers_store.php'
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'freelancers_store.php'; // Send data to freelancer_store.php
+
+    // Append the collected data to the new form
+    for (const [key, value] of allData.entries()) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
     }
 
-    // Main form submission
-    document.getElementById('registrationForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (document.getElementById('freelancer').checked) {
-            toggleVisibility('mainForm', 'developerForm1');
-        } else {
-            this.action = "users_store.php";
-            this.method = "POST";
-            this.submit();
-
-
-        }
-    });
-
-    // Developer form 1 submission
-    document.getElementById('developerForm1Form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        toggleVisibility('developerForm1', 'developerForm2');
-    });
+    // Append the form to the body and submit
+    document.body.appendChild(form);
+    form.submit();
+});
 </script>
+
 
 </body>
 </html>

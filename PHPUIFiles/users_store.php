@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }else{
             echo "Session set successfully.";
         }
+        echo $username;
 
         // Redirect to user dashboard
         header("Location: user_dashboard.php");
