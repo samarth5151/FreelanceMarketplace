@@ -6,8 +6,9 @@
     <title>Create Account</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100..700&family=Poppins:wght@100..900&display=swap" rel="stylesheet">
     <style>
+        /* General Styling */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: whitesmoke;
@@ -15,6 +16,7 @@
             margin: 0;
             padding: 0;
         }
+
         .container {
             width: 40%;
             max-width: 1200px;
@@ -22,21 +24,26 @@
             background-color: #2c2c3d;
             padding: 30px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-            position: relative;
+            border-radius: 10px;
         }
+
         h2 {
             text-align: center;
-            color:rgb(32 159 75);
+            color: rgb(32, 159, 75);
+            margin-bottom: 20px;
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
             margin-bottom: 20px;
         }
+
         label {
             color: #eee;
             margin-bottom: 10px;
         }
+
         input, select, textarea {
             padding: 10px;
             font-size: 13px;
@@ -44,55 +51,68 @@
             border-radius: 5px;
             color: black;
             margin-bottom: 10px;
-            
         }
-        input[type="checkbox"] {
+
+        input[type="checkbox"], input[type="radio"] {
             margin-right: 10px;
-            color: white;
-            background-color: #fff;
         }
+
         .checkbox-group {
             display: flex;
             justify-content: space-around;
+            margin-bottom: 20px;
         }
+
         button {
-            padding: 11px;
+            padding: 12px;
             font-size: 18px;
-            background-color: rgb(32 159 75);
+            background-color: rgb(32, 159, 75);
             color: white;
             border: none;
             border-radius: 9px;
             cursor: pointer;
             width: 100%;
-            margin-top: 20px;
+            transition: background-color 0.3s;
         }
+
         button:hover {
-            background-color: rgb(32 159 75);
+            background-color: #28a965;
         }
+
         .form-row {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
+
         .form-row .form-group {
             flex: 1;
             min-width: 250px;
         }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
             }
+
+            .container {
+                width: 90%;
+                margin: 20px auto;
+            }
         }
-        /* Animation for form transition */
+
+        /* Animation for form transitions */
         .fade-out {
             opacity: 0;
             transition: opacity 0.5s ease-out;
         }
+
         .fade-in {
             opacity: 1;
             transition: opacity 0.5s ease-in;
         }
+
         .hidden {
             display: none;
         }
@@ -163,13 +183,11 @@
                 <input type="file" name="profile" id="profile">           
             </div>
         </div>
-        
 
         <!-- User Type Selection -->
         <div class="checkbox-group">
-        <label><input type="radio" name="usertype" value="Client" id="client"> Client</label>
-        <label><input type="radio" name="usertype" value="freelancer" id="freelancer"> Freelancer</label>
-
+            <label><input type="radio" name="usertype" value="Client" id="client"> Client</label>
+            <label><input type="radio" name="usertype" value="Freelancer" id="freelancer"> Freelancer</label>
         </div>
 
         <!-- Submit Button -->
@@ -180,7 +198,7 @@
 <!-- Developer Forms (hidden initially) -->
 <div class="container hidden" id="developerForm1">
     <h2>Professional Expertise (Form 1)</h2>
-    <form action="freelancers_store.php" method="POST">
+    <form id="freelancerForm1">
         <div class="form-row">
             <div class="form-group">
                 <label for="skills">Specialized Skills</label>
@@ -216,7 +234,7 @@
 
 <div class="container hidden" id="developerForm2">
     <h2>Developer Details (Form 2)</h2>
-    <form action="your_register_backend_script.php" method="POST"  enctype="multipart/form-data" autocomplete="on">
+    <form action="freelancers_store.php" method="POST" enctype="multipart/form-data">
         <div class="form-row">
             <div class="form-group">
                 <label for="languages">Languages Spoken</label>
@@ -257,100 +275,69 @@
         <button type="submit">Submit</button>
     </form>
 </div>
+
 <script>
-   // Helper to toggle visibility with animations
-function toggleVisibility(hideId, showId) {
-    const hideElement = document.getElementById(hideId);
-    const showElement = document.getElementById(showId);
-    hideElement.classList.add('fade-out');
-    setTimeout(() => {
-        hideElement.classList.add('hidden');
-        hideElement.setAttribute('aria-hidden', 'true');
-        showElement.classList.remove('hidden');
-        showElement.classList.add('fade-in');
-        showElement.setAttribute('aria-hidden', 'false');
-    }, 500); // Adjust this based on CSS animation timing
-}
-
-// Collect data from all forms and submit to freelancer_store.php
-function collectFormData() {
-    const mainForm = document.getElementById('registrationForm');
-    const freelancerForm1 = document.getElementById('developerForm1');
-    const freelancerForm2 = document.getElementById('developerForm2');
-
-    // Get data from the main form
-    const mainFormData = new FormData(mainForm);
-
-    // Get data from the freelancer form 1
-    const freelancerForm1Data = new FormData(freelancerForm1);
-
-    // Get data from the freelancer form 2
-    const freelancerForm2Data = new FormData(freelancerForm2);
-
-    // Combine all data into one object
-    const allData = new FormData();
-
-    // Append data from all forms
-    mainFormData.forEach((value, key) => {
-        allData.append(key, value);
-    });
-    freelancerForm1Data.forEach((value, key) => {
-        allData.append(key, value);
-    });
-    freelancerForm2Data.forEach((value, key) => {
-        allData.append(key, value);
-    });
-
-    return allData;
-}
-
-// Main form submission
-document.getElementById('registrationForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (document.getElementById('freelancer').checked) {
-        // Show the first freelancer form when 'Freelancer' is selected
-        toggleVisibility('mainForm', 'developerForm1');
-    } else {
-        // Submit the form if the user is a client
-        this.action = "users_store.php"; // Client registration
-        this.method = "POST";
-        this.submit();
-    }
-});
-
-// Developer form 1 submission
-document.getElementById('developerForm1').addEventListener('submit', function(e) {
-    e.preventDefault();
-    // Show the second freelancer form after the first form is filled
-    toggleVisibility('developerForm1', 'developerForm2');
-});
-
-
-// Developer form 2 submission
-document.getElementById('developerForm2').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    // Collect all the data from the forms
-    const allData = collectFormData();
-
-    // Create a new form to submit the data to 'freelancers_store.php'
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'freelancers_store.php'; // Send data to freelancer_store.php
-
-    // Append the collected data to the new form
-    for (const [key, value] of allData.entries()) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
+    // Helper to toggle visibility with animations
+    function toggleVisibility(hideId, showId) {
+        const hideElement = document.getElementById(hideId);
+        const showElement = document.getElementById(showId);
+        hideElement.classList.add('fade-out');
+        setTimeout(() => {
+            hideElement.classList.add('hidden');
+            hideElement.setAttribute('aria-hidden', 'true');
+            showElement.classList.remove('hidden');
+            showElement.classList.add('fade-in');
+            showElement.setAttribute('aria-hidden', 'false');
+        }, 500); // Adjust based on CSS animation timing
     }
 
-    // Append the form to the body and submit
-    document.body.appendChild(form);
-    form.submit();
-});
+    // Main form submission
+    document.getElementById('registrationForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (document.getElementById('freelancer').checked) {
+            toggleVisibility('mainForm', 'developerForm1');
+        } else {
+            this.submit();
+        }
+    });
+
+    // Developer form 1 submission
+    document.getElementById('freelancerForm1').addEventListener('submit', function (e) {
+        e.preventDefault();
+        toggleVisibility('developerForm1', 'developerForm2');
+    });
+
+    // Developer form 2 submission (final step)
+    document.querySelector('#developerForm2 form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Create a hidden form for redirection
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = 'freelancers_store.php';
+        hiddenForm.enctype = 'multipart/form-data';
+
+        // Append all form data to the hidden form
+        const appendFormData = (form) => {
+            const formData = new FormData(form);
+            for (const [key, value] of formData.entries()) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                hiddenForm.appendChild(input);
+            }
+        };
+
+        // Collect data from all three forms
+        appendFormData(document.getElementById('registrationForm'));
+        appendFormData(document.getElementById('freelancerForm1'));
+        appendFormData(this);
+
+        // Append the hidden form to the body and submit it
+        document.body.appendChild(hiddenForm);
+        hiddenForm.submit();
+    });
 </script>
 
 

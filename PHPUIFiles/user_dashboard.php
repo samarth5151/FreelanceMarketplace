@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 $db = new SQLite3('C:\xampp\htdocs\MegaProject\Connection\Freelance_db.db');

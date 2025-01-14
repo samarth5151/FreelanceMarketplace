@@ -2,6 +2,9 @@
 // Database connection
 $db = new SQLite3('C:\\xampp\\htdocs\\MegaProject\\Connection\\Freelance_db.db');
 
+
+// print_r($_REQUEST);
+
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the freelancer's data from the form
@@ -13,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gender = $_POST['gender'];
     $dob = $_POST['dob'];
     $skills = $_POST['skills'];
+    $usertype =$_POST['usertype'];
     $tools = $_POST['tools'];
     $tagline = $_POST['tagline'];
     $aboutMe = $_POST['aboutMe'];
@@ -29,20 +33,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle Profile Picture upload
     if (isset($_FILES['profile']) && $_FILES['profile']['error'] == 0) {
-        $profilePicture = 'uploads/' . $_FILES['profile']['name'];
+        $profilePicture = 'profile_uploads/' . $_FILES['profile']['name'];
         move_uploaded_file($_FILES['profile']['tmp_name'], $profilePicture);
     }
 
     // Handle Resume upload
     if (isset($_FILES['resume']) && $_FILES['resume']['error'] == 0) {
-        $resume = 'uploads/' . $_FILES['resume']['name'];
+        $resume = 'resumes/' . $_FILES['resume']['name'];
         move_uploaded_file($_FILES['resume']['tmp_name'], $resume);
     }
 
     // Insert freelancer data into the SQLite database
     $stmt = $db->prepare('
-        INSERT INTO freelancers (name, username, password, email, contact, gender, dob, skills, tools, tagline, about_me, experience, languages, availability, degree, institute, graduation_year, profile_picture, resume)
-        VALUES (:name, :username, :password, :email, :contact, :gender, :dob, :skills, :tools, :tagline, :about_me, :experience, :languages, :availability, :degree, :institute, :graduation_year, :profile_picture, :resume)
+        INSERT INTO freelancers (name, username, password, email, contact, gender, dob, skills, usertype, tools, tagline, about_me, experience, languages, availability, degree, institute, graduation_year, profile_picture, resume)
+        VALUES (:name, :username, :password, :email, :contact, :gender, :dob, :skills, :usertype, :tools, :tagline, :about_me, :experience, :languages, :availability, :degree, :institute, :graduation_year, :profile_picture, :resume)
     ');
 
     // Binding parameters
@@ -54,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindValue(':gender', $gender, SQLITE3_TEXT);
     $stmt->bindValue(':dob', $dob, SQLITE3_TEXT);
     $stmt->bindValue(':skills', $skills, SQLITE3_TEXT);
+    $stmt->bindValue(':usertype', $usertype, SQLITE3_TEXT);
     $stmt->bindValue(':tools', $tools, SQLITE3_TEXT);
     $stmt->bindValue(':tagline', $tagline, SQLITE3_TEXT);
     $stmt->bindValue(':about_me', $aboutMe, SQLITE3_TEXT);
@@ -71,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result) {
         echo "Freelancer details have been stored successfully!";
+        header('location: freelancer_dashboard.php');
     } else {
         echo "Error storing freelancer details!";
     }
