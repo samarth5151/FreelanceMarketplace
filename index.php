@@ -24,7 +24,7 @@
 
 
 <?php
-    $heroimg = "./Assets/30257374.jpg";
+    $heroimg = "./Assets/freepik__upload__4798.jpg";
 ?>
 <div class="hero-section">
     <section class="content">
@@ -33,7 +33,7 @@
         <h1><span> Work</span> Seamlessly</h1>
         <p>Verified software talent and smart tools to accelerate your tech initiatives</p>
         <div class="cta-buttons">
-            <button class="btn-71 btnhero12">Post a Job</button>
+            <a class="btn-71 btnhero12" href="PHPUIFiles/Post-Job.php">Post a Job</a>
             <button id="btn-button119" class="btn70 btnhero11">Find jobs</button>
         </div>
     </section>
@@ -44,7 +44,7 @@
 </div>
 
 
-<section class="steps-section">
+<section class="steps-section" id="howitworks">
         <h2>How does it work?</h2>
         <h1>Talent Acquisition Made Simple</h1>
         <div class="steps-container">

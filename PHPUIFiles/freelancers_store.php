@@ -1,6 +1,6 @@
 <?php
 // Database connection
-$db = new SQLite3('C:\\xampp\\htdocs\\MegaProject\\Connection\\Freelance_db.db');
+$db = new SQLite3('C:\xampp\htdocs\FreelanceMarketplace\Connection\Freelance_db.db');
 
 
 // print_r($_REQUEST);

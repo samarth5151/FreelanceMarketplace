@@ -12,10 +12,11 @@ header, .header {
 nav {
     border-radius: 12px;
     border-radius: 12px;
-    padding: 30px 20px;
+    padding: 25px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color:#fff;
 }
 .nav-btns{
     display: flex;
@@ -43,6 +44,10 @@ nav ul li a {
     color: rgba(0, 0, 0, 0.644);
     font-weight: 500;
     transition: color 0.3s ease;
+}
+nav ul li a:active {
+    color:black;
+    font-weight:500;
 }
 
 nav ul li a:hover {
@@ -106,8 +111,9 @@ box-sizing: border-box;
 transparent;
 -webkit-appearance: button;
 background-color: 
-#000;
+#262b40;
 background-image: none;
+text-decoration: none;
 color: 
 #fff;
 cursor: pointer;
@@ -147,7 +153,7 @@ position: relative;
 --opacity: 0.2;
 aspect-ratio: 1;
 background: 
-#000;
+grey;
 border-radius: 50%;
 content: "";
 left: 50%;
@@ -190,7 +196,7 @@ margin-right: 10px;
 <nav >
         <div class="logo"><img src="./Assets/logo2.png" style="height:50px; margin-left:8px;" ></div>
         <ul class="nav-menu">
-            <li><a href="#">How it Works</a></li>
+            <li><a href="#howitworks">How it Works</a></li>
             <li><a href="#">Find Work</a></li>
             <li><a href="./PHPUIFiles/about-us.php">About Us</a></li>
             <li><a href="./PHPUIFiles/contact-us.php">Contact Us</a></li>

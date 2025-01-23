@@ -8,7 +8,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Specify the correct database file path
-$db = new SQLite3('C:/xampp/htdocs/MegaProject/Connection/Freelance_db.db');
+$db = new SQLite3('C:\xampp\htdocs\FreelanceMarketplace\Connection\Freelance_db.db');
 
 // Check if the connection is successful
 if (!$db) {

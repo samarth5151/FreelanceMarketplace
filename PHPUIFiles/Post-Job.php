@@ -4,17 +4,18 @@
    <head>
       <meta charset="utf-8">
       <title>Post A Job</title>
-      
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
    </head>
    <style>
-     @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   outline: none;
   font-family: 'Poppins', sans-serif;
 }
+
 body {
   display: flex;
   align-items: center;
@@ -23,174 +24,243 @@ body {
   overflow: hidden;
   background: url("bg.png"), -webkit-linear-gradient(bottom, #0250c5, #d43f8d);
 }
+
 ::selection {
   color: #fff;
   background: #d43f8d;
 }
+
 .container {
-  width: 400px;
+  width: 100%;
+  max-width: 420px; /* Reduced max width slightly */
   background: #fff;
   text-align: center;
   border-radius: 5px;
-  padding: 50px 35px 10px 35px;
+  padding: 20px 20px; /* Reduced padding */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional enhancement */
 }
+
 .container header {
-  font-size: 30px;
+  font-size: 22px; /* Slightly reduced font size */
   font-weight: 600;
-  margin: 0 0 30px 0;
+  margin: 0 0 15px 0; /* Reduced bottom margin */
 }
+
 .container .form-outer {
   width: 100%;
   overflow: hidden;
 }
+
 .container .form-outer form {
   display: flex;
   width: 400%;
 }
+
 .form-outer form .page {
   width: 25%;
   transition: margin-left 0.3s ease-in-out;
+  position: relative;
+  padding-bottom: 50px; /* Reduced bottom padding */
 }
+
 .form-outer form .page .title {
   text-align: left;
-  font-size: 22px;
+  font-size: 18px; /* Reduced font size */
   font-weight: 500;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
+
 .form-outer form .page .field {
   width: 100%;
-  margin: 20px 0;
+  margin: 8px 0; /* Reduced margin between fields */
   display: flex;
   flex-direction: column;
 }
+
 form .page .field .label {
   margin-bottom: 5px;
   font-weight: 500;
   text-align: left;
 }
+
 form .page .field input,
 form .page .field select,
 form .page .field textarea {
-  height: 40px;
+  height: 38px; /* Reduced height */
   width: 100%;
   border: 1px solid lightgrey;
   border-radius: 5px;
-  padding: 0 10px;
-  font-size: 16px;
+  padding: 0 8px; /* Reduced padding inside input */
+  font-size: 14px; /* Slightly smaller font size */
 }
+
 form .page .field textarea {
-  height: 80px;
+  height: 70px; /* Reduced height */
   resize: none;
 }
+
 form .page .field button {
-  width: 100%;
-  height: 45px;
+  height: 40px; /* Reduced button height */
   border: none;
   background: #d33f8d;
   margin-top: 10px;
   border-radius: 5px;
   color: #fff;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px; /* Reduced font size */
   font-weight: 500;
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: 0.5s ease;
 }
+
 form .page .field button:hover {
   background: #000;
 }
+
 form .page .btns {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   display: flex;
   justify-content: space-between;
 }
-form .page .btns button {
-  width: calc(50% - 5px);
+
+form .page.step-4 .btns {
+  justify-content: flex-end;
 }
+
 .container .progress-bar {
   display: flex;
-  margin: 30px 0;
+  margin: 10px 0; /* Reduced margin */
   user-select: none;
 }
+
 .container .progress-bar .step {
   text-align: center;
   width: 100%;
   position: relative;
+  margin-right: 8px; /* Reduced margin between steps */
 }
+
 .container .progress-bar .step p {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 12px; /* Slightly reduced font size */
   color: #000;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
+
 .progress-bar .step .bullet {
-  height: 25px;
-  width: 25px;
+  height: 22px; /* Reduced size of bullets */
+  width: 22px;
   border: 2px solid #000;
   display: inline-block;
   border-radius: 50%;
   position: relative;
   transition: 0.2s;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 25px;
+  font-size: 12px;
+  line-height: 22px;
 }
+
 .progress-bar .step .bullet.active {
   border-color: #d43f8d;
   background: #d43f8d;
 }
+
 .progress-bar .step .bullet span {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
+
 .progress-bar .step .bullet.active span {
   display: none;
 }
+
 .progress-bar .step .bullet:before,
 .progress-bar .step .bullet:after {
   position: absolute;
   content: '';
-  bottom: 11px;
-  right: -51px;
+  bottom: 9px;
+  right: -45px;
   height: 3px;
-  width: 44px;
+  width: 40px;
   background: #262626;
 }
+
 .progress-bar .step .bullet.active:after {
   background: #d43f8d;
   transform: scaleX(0);
   transform-origin: left;
   animation: animate 0.3s linear forwards;
 }
+
 @keyframes animate {
   100% {
     transform: scaleX(1);
   }
 }
+
 .progress-bar .step:last-child .bullet:before,
 .progress-bar .step:last-child .bullet:after {
   display: none;
 }
+
 .progress-bar .step p.active {
   color: #d43f8d;
   transition: 0.2s linear;
 }
+
 .progress-bar .step .check {
   position: absolute;
   left: 50%;
   top: 70%;
-  font-size: 15px;
+  font-size: 14px;
   transform: translate(-50%, -50%);
   display: none;
 }
+
 .progress-bar .step .check.active {
   display: block;
   color: #fff;
 }
 
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    padding: 20px; /* Adjusted padding for smaller screens */
+  }
 
-   </style>
+  .container header {
+    font-size: 20px;
+  }
+
+  .form-outer form {
+    width: 500%;
+  }
+
+  .form-outer form .page .title {
+    font-size: 16px;
+  }
+
+  .form-outer form .page .field {
+    margin: 6px 0;
+  }
+
+  form .page .field button {
+    font-size: 14px;
+  }
+
+  .progress-bar {
+    margin: 8px 0;
+  }
+}
+</style>
+
+
+
    <body>
    <div class="container">
    <header>Post A Job</header>
@@ -226,6 +296,7 @@ form .page .btns button {
    </div>
    <div class="form-outer">
       <form action="#">
+
          <!-- Step 1: Job Details -->
          <div class="page slide-page">
             <div class="title">Job Details:</div>
@@ -234,10 +305,22 @@ form .page .btns button {
                <input type="text" placeholder="Enter the job title">
             </div>
             <div class="field">
+               <div class="label">Job Category</div>
+               <select>
+
+                  <option>Web Development</option>
+                  <option>Mobile Development</option>
+               
+               </select>
+            </div>
+            <div class="field">
                <div class="label">Job Description</div>
                <textarea placeholder="Describe the job requirements"></textarea>
             </div>
-
+            <div class="field">
+               <div class="label">Attachments</div>
+               <input type="file">
+            </div>
             <div class="field">
                <button class="firstNext next">Next</button>
             </div>
@@ -253,6 +336,14 @@ form .page .btns button {
             <div class="field">
                <div class="label">Additional Skills</div>
                <input type="text" placeholder="e.g., JavaScript, PHP">
+            </div>
+            <div class="field">
+               <div class="label">Experience Level</div>
+               <select>
+                  <option>Beginner</option>
+                  <option>Intermediate</option>
+                  <option>Expert</option>
+               </select>
             </div>
             <div class="field btns">
                <button class="prev-1 prev">Previous</button>
@@ -271,6 +362,7 @@ form .page .btns button {
                <div class="label">Deadline</div>
                <input type="date">
             </div>
+
             <div class="field btns">
                <button class="prev-2 prev">Previous</button>
                <button class="next-2 next">Next</button>
@@ -281,12 +373,8 @@ form .page .btns button {
          <div class="page">
             <div class="title">Review & Submit:</div>
             <div class="field">
-               <div class="label">Username</div>
-               <input type="text" placeholder="Enter your username">
-            </div>
-            <div class="field">
-               <div class="label">Password</div>
-               <input type="password" placeholder="Enter your password">
+               <div class="label">Additional Questions</div>
+               <textarea placeholder="Ask any additional questions if required"></textarea>
             </div>
             <div class="field btns">
                <button class="prev-3 prev">Previous</button>
@@ -296,89 +384,44 @@ form .page .btns button {
       </form>
    </div>
 </div>
+
 <script>
-    // JavaScript for Post A Job Multi-step Form
+   let current = 0;
+   const pages = document.querySelectorAll(".page");
+   const nextButtons = document.querySelectorAll(".next");
+   const prevButtons = document.querySelectorAll(".prev");
 
-const slidePage = document.querySelector(".slide-page");
-const nextBtnFirst = document.querySelector(".firstNext");
-const prevBtnSec = document.querySelector(".prev-1");
-const nextBtnSec = document.querySelector(".next-1");
-const prevBtnThird = document.querySelector(".prev-2");
-const nextBtnThird = document.querySelector(".next-2");
-const prevBtnFourth = document.querySelector(".prev-3");
-const submitBtn = document.querySelector(".submit");
-const progressText = document.querySelectorAll(".step p");
-const progressCheck = document.querySelectorAll(".step .check");
-const bullet = document.querySelectorAll(".step .bullet");
+   nextButtons.forEach((button, index) => {
+      button.addEventListener("click", () => {
+         pages[current].style.marginLeft = "-25%";
+         current++;
+         updateProgressBar();
+      });
+   });
 
-let current = 1;
+   prevButtons.forEach((button, index) => {
+      button.addEventListener("click", () => {
+         pages[current].style.marginLeft = "0";
+         current--;
+         updateProgressBar();
+      });
+   });
 
-nextBtnFirst.addEventListener("click", function(event) {
-  event.preventDefault();
-  slidePage.style.marginLeft = "-25%";
-  bullet[current - 1].classList.add("active");
-  progressCheck[current - 1].classList.add("active");
-  progressText[current - 1].classList.add("active");
-  current += 1;
-});
+   function updateProgressBar() {
+      const bullets = document.querySelectorAll(".bullet");
+      const steps = document.querySelectorAll(".step p");
 
-nextBtnSec.addEventListener("click", function(event) {
-  event.preventDefault();
-  slidePage.style.marginLeft = "-50%";
-  bullet[current - 1].classList.add("active");
-  progressCheck[current - 1].classList.add("active");
-  progressText[current - 1].classList.add("active");
-  current += 1;
-});
-
-nextBtnThird.addEventListener("click", function(event) {
-  event.preventDefault();
-  slidePage.style.marginLeft = "-75%";
-  bullet[current - 1].classList.add("active");
-  progressCheck[current - 1].classList.add("active");
-  progressText[current - 1].classList.add("active");
-  current += 1;
-});
-
-submitBtn.addEventListener("click", function(event) {
-  event.preventDefault();
-  bullet[current - 1].classList.add("active");
-  progressCheck[current - 1].classList.add("active");
-  progressText[current - 1].classList.add("active");
-
-  setTimeout(function() {
-    alert("Your job has been successfully posted!");
-    location.reload();
-  }, 800);
-});
-
-prevBtnSec.addEventListener("click", function(event) {
-  event.preventDefault();
-  slidePage.style.marginLeft = "0%";
-  bullet[current - 2].classList.remove("active");
-  progressCheck[current - 2].classList.remove("active");
-  progressText[current - 2].classList.remove("active");
-  current -= 1;
-});
-
-prevBtnThird.addEventListener("click", function(event) {
-  event.preventDefault();
-  slidePage.style.marginLeft = "-25%";
-  bullet[current - 2].classList.remove("active");
-  progressCheck[current - 2].classList.remove("active");
-  progressText[current - 2].classList.remove("active");
-  current -= 1;
-});
-
-prevBtnFourth.addEventListener("click", function(event) {
-  event.preventDefault();
-  slidePage.style.marginLeft = "-50%";
-  bullet[current - 2].classList.remove("active");
-  progressCheck[current - 2].classList.remove("active");
-  progressText[current - 2].classList.remove("active");
-  current -= 1;
-});
-
+      for (let i = 0; i < bullets.length; i++) {
+         if (i <= current) {
+            bullets[i].classList.add("active");
+            steps[i].classList.add("active");
+         } else {
+            bullets[i].classList.remove("active");
+            steps[i].classList.remove("active");
+         }
+      }
+   }
 </script>
+
    </body>
 </html>

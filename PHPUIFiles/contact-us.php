@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Navbar</title>
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i">
+    <link id="u-page-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i">
     <style>
         /*navbar*/
 header, .header {
@@ -16,6 +18,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-weight: bold;
 }
 .nav-btns{
     display: flex;
@@ -41,10 +44,12 @@ nav ul li {
 nav ul li a {
     text-decoration: none;
     color: rgba(0, 0, 0, 0.644);
-    font-weight: 500;
     transition: color 0.3s ease;
 }
-
+nav ul li a:active {
+    color:black;
+    font-weight:500;
+}
 nav ul li a:hover {
     color: black;
 }
