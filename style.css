@@ -166,13 +166,13 @@ nav {
     grid-template-columns: 52vw 48vw;
     height: 90vh;
     flex-wrap: wrap;
-    background-color: #fff;
+    background-color: whitesmoke;
 }
 .content {
-    background-color: #fff;
+    background-color: whitesmoke;
     height: 90vh;
     color: rgba(0, 0, 0, 0.644);
-    padding:150px 100px;
+    padding:100px 100px;
     width: 100%;
 }
 

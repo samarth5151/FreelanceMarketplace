@@ -47,13 +47,12 @@ try {
     $stmt->execute();
     $order_id = $db->lastInsertRowID();
 
-    // Record client payment
-    $stmt = $db->prepare("INSERT INTO clientspayments (order_id, client_id, freelancer_id, job_id, amount) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bindValue(1, $order_id, SQLITE3_INTEGER);
-    $stmt->bindValue(2, $user_id, SQLITE3_INTEGER);
-    $stmt->bindValue(3, $freelancer_id, SQLITE3_INTEGER);
-    $stmt->bindValue(4, $job_id, SQLITE3_INTEGER);
-    $stmt->bindValue(5, $bid_amount, SQLITE3_FLOAT);
+    $stmt = $db->prepare("INSERT INTO clientspayments (client_id, job_id, amount, payment_date, order_id) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bindValue(1, $user_id, SQLITE3_INTEGER);
+    $stmt->bindValue(2, $job_id, SQLITE3_INTEGER);
+    $stmt->bindValue(3, $bid_amount, SQLITE3_FLOAT);
+    $stmt->bindValue(4, date('Y-m-d H:i:s'), SQLITE3_TEXT);
+    $stmt->bindValue(5, $order_id, SQLITE3_INTEGER); // Add this line
     $stmt->execute();
     $payment_id = $db->lastInsertRowID();
 

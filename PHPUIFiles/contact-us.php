@@ -38,7 +38,7 @@
             border-radius: 12px;
             padding: 20px 40px;
             margin: 20px auto;
-            max-width: 1400px;
+            max-width: 1480px;
             display: flex;
             justify-content: space-between;
             align-items: center;

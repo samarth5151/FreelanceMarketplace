@@ -36,7 +36,7 @@
             border-radius: 12px;
             padding: 20px 40px;
             margin: 20px auto;
-            max-width: 1400px;
+            max-width: 1480px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -146,7 +146,7 @@
         </div>
         
         <ul class="nav-menu">
-            <li><a href="#">How it Works</a></li>
+            <li><a href="#howitworks">How it Works</a></li>
             <li><a href="./PHPUIFiles/Find-Job.php">Find Work</a></li>
             <li><a href="./PHPUIFiles/about-us.php">About Us</a></li>
             <li><a href="./PHPUIFiles/contact-us.php">Contact Us</a></li>

@@ -26,59 +26,67 @@
             padding: 0;
         }
         
-        /* Navbar - matches your existing style */
-        header, .header {
-            background: none;
-        }
         
+        
+        
+        /* Navigation */
         nav {
+            background-color: var(--bg-white);
             border-radius: 12px;
-            padding: 25px 20px;
+            padding: 20px 40px;
+            margin: 20px auto;
+            max-width: 1480px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--bg-white);
-            margin: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         
-        .nav-btns {
-            display: flex;
-            align-items: center;
-        }
-        
-        nav .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-        
         .logo img {
-            height: 40px;
+            height: 50px;
+            transition: transform 0.3s ease;
         }
         
-        nav ul {
-            list-style-type: none;
+        .logo img:hover {
+            transform: translateY(-3px);
+        }
+        
+        .nav-menu {
             display: flex;
+            list-style: none;
         }
         
-        nav ul li {
+        .nav-menu li {
             margin: 0 15px;
         }
         
-        nav ul li a {
+        .nav-menu a {
             text-decoration: none;
             color: var(--text-primary);
-            transition: color 0.3s ease;
-            font-size: 1rem;
             font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
         }
         
-        nav ul li a:active, nav ul li a:hover {
+        .nav-menu a:hover {
             color: var(--text-hover);
-            font-weight: 500;
         }
-
+        
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent-green);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+        
         .nav-btns {
             display: flex;
             align-items: center;
@@ -324,6 +332,49 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Hero Section */
+        .contact-hero {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #3a4166 100%);
+            padding: 100px 5%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center;
+            background-size: cover;
+            opacity: 0.15;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .hero-content p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 30px;
+        }
+        
     </style>
     <!-- Include your existing navbar styles here -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -331,7 +382,7 @@
 </head>
 <body>
     <!-- Navigation - matches your existing navbar -->
-    <nav>
+    <nav style="max-width:1480px;">
         <div class="logo">
             <img src="../Assets/logo2.png" alt="Freelance Marketplace Logo">
         </div>
@@ -357,7 +408,15 @@
         </div>
     </nav>
     </nav>
-    
+
+    <!-- Hero Section -->
+    <section class="contact-hero" style="height:200px;">
+        <div class="hero-content">
+            <h1>About Us</h1>
+            <p>We bridge the gap between top-tier freelancers and businesses—empowering work without boundaries.</p>
+        </div>
+    </section>
+
     <!-- About Hero Section -->
     <section class="section">
         <div class="about-hero">

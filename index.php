@@ -38,8 +38,14 @@
         </div>
     </section>
     
-        <!-- Corrected to echo the image path -->
-        <img class="hero-img" src="<?php echo $heroimg; ?>" alt="Hero-Image">
+        <dotlottie-player
+  src="https://lottie.host/02bd7189-3912-496a-be6a-02d04b83e026/rAApzAnrT8.lottie"
+  background="transparent"
+  speed="1"
+  style="width: 550px; height: 550px;margin-left:100px;margin-top:10px;"
+  loop
+  autoplay
+></dotlottie-player>
     
 </div>
 
@@ -79,7 +85,7 @@
 </section>
 
 <?php
-$image_path = "/FreelancerMarketplace/Assets/2YgsRc.webp";
+$image_path = "./Assets/2YgsRc.webp";
 ?>
 
 <section style="padding: 80px 20px; color: #FFFFFF; text-align: center; position: relative;">
@@ -112,5 +118,10 @@ $image_path = "/FreelancerMarketplace/Assets/2YgsRc.webp";
             navMenu.classList.toggle('active');
         });
     </script>
+<script
+  src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+  type="module"
+></script>
+
 </body>
 </html>

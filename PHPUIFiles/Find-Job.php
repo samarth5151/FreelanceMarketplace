@@ -132,7 +132,7 @@ $jobs = fetchJobs($db, $filters);
             --text-primary: rgba(0, 0, 0, 0.644);
             --text-hover: #000000;
             --bg-light: whitesmoke;
-            --bg-white: whitesmoke;
+            --bg-white: #fff;
             --gray-icon: #c9d1d9;
             --button-hover: rgb(81, 81, 81);
             --section-padding: 80px 5%;
@@ -154,78 +154,116 @@ $jobs = fetchJobs($db, $filters);
             flex-direction: column;
             min-height: 100vh;
         }
-
-        /* Navbar */
-        .navbar {
+/* Navigation */
+nav {
             background-color: var(--bg-white);
-            padding: 0 30px;
+            border-radius: 12px;
+            padding: 20px 40px;
+            margin: 20px auto;
+            width: 1480px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin: 10px 15px 5px 15px;
-            border-radius: 12px;
-            height: 70px;
         }
-
-        .navbar-container {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .logo img {
+            height: 50px;
+            transition: transform 0.3s ease;
         }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-dark);
-            text-decoration: none;
+        
+        .logo img:hover {
+            transform: translateY(-3px);
         }
-
-        .navbar-brand img {
-            height: 40px;
-        }
-
-        .navbar-nav {
+        
+        .nav-menu {
             display: flex;
             list-style: none;
-            gap: 30px;
-            align-items: center;
         }
-
-        .nav-link {
-            color: var(--text-primary);
+        
+        .nav-menu li {
+            margin: 0 15px;
+        }
+        
+        .nav-menu a {
             text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-            white-space: nowrap;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
         }
-
-        .nav-link:hover {
+        
+        .nav-menu a:hover {
             color: var(--text-hover);
         }
-
-        .nav-btn {
-            background-color: var(--primary-dark);
+        
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent-green);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+        
+        .nav-btns {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-login {
+            font-weight: 600;
+            font-size: 1rem;
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            color: var(--text-hover);
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .btn-register {
+            background: var(--primary-dark);
             color: white;
-            padding: 10px 25px;
+            border: none;
+            padding: 12px 28px;
             border-radius: 50px;
             font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
-        .nav-btn:hover {
-            background-color: var(--button-hover);
-            transform: translateY(-2px);
+        
+        .btn-register:hover {
+            background: var(--button-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
-
+        
+        .menu-icon {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-icon);
+        }
+        
         /* Search Section */
         .search-section {
-            background-color: var(--bg-white);
+            background-color: var(--bg-light);
             padding: 40px 5%;
             margin: 15px;
             border-radius: 12px;
@@ -743,20 +781,31 @@ $jobs = fetchJobs($db, $filters);
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a class="navbar-brand" href="../index.php">
-                <img src="../Assets/logo2.png" alt="CodeBrains Logo">
-             
-            </a>
-            <ul class="navbar-nav">
-                <li><a class="nav-link" href="../index.php">Home</a></li>
-                <li><a class="nav-link" href="#my-jobs">My Jobs</a></li>
-                <li><a class="nav-link" href="#messages">Messages</a></li>
-                <li><a class="nav-btn" href="#logout">Logout</a></li>
-            </ul>
+<nav>
+        <div class="logo">
+            <img src="../Assets/logo2.png" alt="Freelance Marketplace Logo">
         </div>
-    </nav>
+        
+        <ul class="nav-menu">
+            <li><a href="#howitworks">How it Works</a></li>
+            <li><a href="../PHPUIFiles/Find-Job.php">Find Work</a></li>
+            <li><a href="../PHPUIFiles/about-us.php">About Us</a></li>
+            <li><a href="../PHPUIFiles/contact-us.php">Contact Us</a></li>
+        </ul>
+        
+        <div class="nav-btns">
+            <a href="PHPUIFiles/login.php">
+                <button class="btn-login">Login</button>
+            </a>
+            <a href="../PHPUIFiles/register.php">
+                <button class="btn-register">Register</button>
+            </a>
+        </div>
+        
+        <div class="menu-icon">
+            <i class="fas fa-bars"></i>
+        </div>
+</nav>
 
     <section class="search-section">
         <h1>Find Your <span>Perfect</span> Job Match</h1>
