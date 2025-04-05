@@ -1,0 +1,290 @@
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #4f46e5;
+    --success-color: #22c55e;
+    --danger-color: #ef4444;
+  }
+  body {
+    background-color: #f8fafc;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .job-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 2.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+  .status-badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .nav-tabs {
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .nav-tabs .nav-link {
+    color: #64748b;
+    border: none;
+    padding: 1rem 1.5rem;
+    transition: all 0.2s ease;
+  }
+  .nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    font-weight: 600;
+    background: transparent;
+    border-bottom: 3px solid var(--primary-color);
+  }
+  .nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.05);
+  }
+  .proposal-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid transparent;
+  }
+  .proposal-card:hover {
+    transform: translateY(-2px);
+    border-left-color: var(--primary-color);
+  }
+  .file-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+  }
+  .skill-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .timeline-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .upload-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .upload-btn input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .job-status-controls .btn {
+    min-width: 120px;
+    transition: all 0.3s ease;
+  }
+  .sealed-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success-color);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .freelancer-rating {
+    color: #f59e0b;
+    font-size: 0.9rem;
+  }
+  .proposal-excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #64748b;
+  }
+  .read-more {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .bid-price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  .freelancer-avatar {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+  }
+
+
+/* Modal Slideout Styles */
+.modal-dialog-slideout {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    width: 50%; /* Half of the screen width */
+    max-width: 100%;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+  }
+  
+  .modal-dialog-slideout.show {
+    transform: translateX(0);
+  }
+  
+  .modal-content {
+    height: 100vh;
+    overflow-y: auto;
+    border-radius: 0;
+    border: none;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.5rem;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  /* Profile Styles */
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .profile-section {
+    margin-bottom: 2rem;
+  }
+  
+  .profile-section h6 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1e293b;
+  }
+  
+  .profile-section p {
+    color: #64748b;
+    line-height: 1.6;
+  }
+  
+  .skill-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+  }
+  
+  .freelancer-rating {
+    color: #f59e0b;
+    font-size: 0.9rem;
+  }
+  
+  .testimonial-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .testimonial-text {
+    color: #64748b;
+    font-style: italic;
+  }
+  
+  .testimonial-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+  }
+
+  /* Hired Freelancers Section */
+.hired-freelancers {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.freelancer-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.freelancer-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.freelancer-avatar {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+
+    /* border: 2px solid var(--primary-color); */
+}
+
+.freelancer-card h6 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+}
+
+.freelancer-card p {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.freelancer-card .btn-message {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.freelancer-card .btn-message:hover {
+    background-color: var(--primary-color);
+    color: white;
+}

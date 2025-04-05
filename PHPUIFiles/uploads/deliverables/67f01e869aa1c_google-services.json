@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1022228636726",
+    "project_id": "tecfresh-5c318",
+    "storage_bucket": "tecfresh-5c318.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022228636726:android:db783166c40ae689af6497",
+        "android_client_info": {
+          "package_name": "com.example.TecFresh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqEIL7N6Sahd3B5sqycp8_0LAjuHTK3K8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

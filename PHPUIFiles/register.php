@@ -24,7 +24,6 @@
             background-color: #2c2c3d;
             padding: 30px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
         }
 
         h2 {
@@ -41,6 +40,7 @@
 
         label {
             color: #eee;
+            font-size:14px;
             margin-bottom: 10px;
         }
 
@@ -65,11 +65,12 @@
 
         button {
             padding: 12px;
-            font-size: 18px;
+            font-size: 16px;
             background-color: rgb(32, 159, 75);
             color: white;
             border: none;
-            border-radius: 9px;
+
+            border-radius: 4px;
             cursor: pointer;
             width: 100%;
             transition: background-color 0.3s;
@@ -116,13 +117,36 @@
         .hidden {
             display: none;
         }
+
+
+
+
+.loginbtn{
+    width: 100%;
+    margin-bottom:20px;
+    text-align: center;
+    margin-top: 25px;
+}
+        .loginbtn a{
+            text-decoration: none;
+            color:white;
+            cursor:pointer;
+            font-size:14px;
+            text-align:center;
+            margin-top:25px;
+            
+            
+        }
+        .loginbtn a span{
+            color:blue;
+        }
     </style>
 </head>
 <body>
 
 <div class="container" id="mainForm">
     <h2>Create an Account</h2>
-    <form action="users_store.php" method="POST" id="registrationForm" enctype="multipart/form-data">
+    <form style="margin-top:40px;" action="users_store.php" method="POST" id="registrationForm" enctype="multipart/form-data">
 
         <!-- Personal Details -->
         <div class="form-row">
@@ -192,13 +216,18 @@
 
         <!-- Submit Button -->
         <button type="submit">Register</button>
+
+        <div class="loginbtn">
+            <a href="./login.php"> Already have an account,<span> login here.</span></a>
+        </div>
+
     </form>
 </div>
 
 <!-- Developer Forms (hidden initially) -->
 <div class="container hidden" id="developerForm1">
     <h2>Professional Expertise (Form 1)</h2>
-    <form id="freelancerForm1">
+    <form id="freelancerForm1" enctype="multipart/form-data">
         <div class="form-row">
             <div class="form-group">
                 <label for="skills">Specialized Skills</label>
@@ -270,11 +299,15 @@
                 <label for="graduationYear">Graduation Year</label>
                 <input type="number" id="graduationYear" name="graduationYear" placeholder="Graduation year" required>
             </div>
-        </div>
+    </div>
+
 
         <button type="submit">Submit</button>
+
+        
     </form>
 </div>
+
 
 <script>
     // Helper to toggle visibility with animations
@@ -297,6 +330,7 @@
         if (document.getElementById('freelancer').checked) {
             toggleVisibility('mainForm', 'developerForm1');
         } else {
+            
             this.submit();
         }
     });
@@ -309,37 +343,53 @@
 
     // Developer form 2 submission (final step)
     document.querySelector('#developerForm2 form').addEventListener('submit', function (e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        // Create a hidden form for redirection
-        const hiddenForm = document.createElement('form');
-        hiddenForm.method = 'POST';
-        hiddenForm.action = 'freelancers_store.php';
-        hiddenForm.enctype = 'multipart/form-data';
+    // Create a new FormData object to collect all data
+    const formData = new FormData();
 
-        // Append all form data to the hidden form
-        const appendFormData = (form) => {
-            const formData = new FormData(form);
-            for (const [key, value] of formData.entries()) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                hiddenForm.appendChild(input);
-            }
-        };
+    // Append data from the registration form (including files)
+    const registrationForm = document.getElementById('registrationForm');
+    const registrationFormData = new FormData(registrationForm);
+    for (const [key, value] of registrationFormData.entries()) {
+        formData.append(key, value);
+    }
 
-        // Collect data from all three forms
-        appendFormData(document.getElementById('registrationForm'));
-        appendFormData(document.getElementById('freelancerForm1'));
-        appendFormData(this);
+    // Append data from the first developer form
+    const freelancerForm1 = document.getElementById('freelancerForm1');
+    const freelancerForm1Data = new FormData(freelancerForm1);
+    for (const [key, value] of freelancerForm1Data.entries()) {
+        formData.append(key, value);
+    }
 
-        // Append the hidden form to the body and submit it
-        document.body.appendChild(hiddenForm);
-        hiddenForm.submit();
+    // Append data from the current developer form (form 2)
+    const developerForm2Data = new FormData(this);
+    for (const [key, value] of developerForm2Data.entries()) {
+        formData.append(key, value);
+    }
+
+    // Submit the combined FormData using Fetch API
+    fetch('freelancers_store.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            return response.text();
+        }
+    })
+    .then(data => {
+        console.log(data);
+        window.location.href = 'freelancer_dashboard.php'; // Redirect on success
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
     });
 </script>
-
 
 </body>
 </html>

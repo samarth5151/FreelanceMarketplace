@@ -19,7 +19,7 @@
 </head>
 <body>
     <?php
-         include('./PHPUIFiles/Navbar.php');
+         include('./Navbar.php');
     ?>
 
 
@@ -79,7 +79,7 @@
 </section>
 
 <?php
-$image_path = "/MegaProject/Assets/2YgsRc.webp";
+$image_path = "/FreelancerMarketplace/Assets/2YgsRc.webp";
 ?>
 
 <section style="padding: 80px 20px; color: #FFFFFF; text-align: center; position: relative;">

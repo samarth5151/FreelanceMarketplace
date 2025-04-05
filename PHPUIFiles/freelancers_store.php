@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Database connection
 $db = new SQLite3('C:\xampp\htdocs\FreelanceMarketplace\Connection\Freelance_db.db');
 
@@ -10,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the freelancer's data from the form
     $name = $_POST['name'];
     $username = $_POST['username'];
-    $password = $_POST['password'];
+    $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT); // Hash password
     $email = $_POST['email'];
     $contact = $_POST['contact'];
     $gender = $_POST['gender'];
@@ -76,7 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result) {
         echo "Freelancer details have been stored successfully!";
-        header('location: freelancer_dashboard.php');
+        $_SESSION['username']= $_POST['username'];
+        echo "hi";
+        echo $_SESSION['username'];
+        
+        // header('location: freelancer_dashboard.php');
     } else {
         echo "Error storing freelancer details!";
     }
