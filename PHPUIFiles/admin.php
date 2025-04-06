@@ -1,3 +1,340 @@
+<?php
+// Database connection
+$db = new SQLite3('C:\xampp\htdocs\FreelanceMarketplace\Connection\Freelance_db.db');
+
+// Fetch all dashboard statistics
+$clientCount = $db->querySingle("SELECT COUNT(*) FROM users");
+$freelancerCount = $db->querySingle("SELECT COUNT(*) FROM freelancers");
+$totalUsers = $clientCount + $freelancerCount;
+$totalPlatformRevenue = $db->querySingle("SELECT SUM(amount) FROM revenue") ?: 0;
+$totalClientPayments = $db->querySingle("SELECT SUM(amount) FROM clientspayments") ?: 0;
+$totalFreelancerEarnings = $totalClientPayments * 0.85; // 15% platform fee
+$totalJobsCompleted = $db->querySingle("SELECT COUNT(*) FROM orders WHERE status = 'Submitted'");
+
+
+$revenueData = [];
+$revenueLabels = [];
+$weeks = 8;
+
+for ($i = $weeks - 1; $i >= 0; $i--) {
+    $date = new DateTime();
+    $date->modify("-$i week");
+    $weekStart = $date->format('Y-m-d');
+    $date->modify("+6 days");
+    $weekEnd = $date->format('Y-m-d');
+    
+    $weekRevenue = $db->querySingle("
+        SELECT SUM(amount) 
+        FROM revenue 
+        WHERE date(revenue_date) BETWEEN '$weekStart' AND '$weekEnd'
+    ") ?: 0;
+    
+    $revenueData[] = $weekRevenue;
+    $revenueLabels[] = $date->format('M d');
+}
+
+
+// Fetch clients data
+$clientsResult = $db->query("
+    SELECT 
+        u.users_id,
+        u.users_name,
+        u.username,
+        u.users_email AS email,
+        DATE(u.users_dob) AS joined_date,
+        COUNT(j.id) AS jobs_posted,
+        COALESCE(SUM(o.amount), 0) AS total_spent
+    FROM users u
+    LEFT JOIN jobs j ON u.username = j.username
+    LEFT JOIN orders o ON j.id = o.job_id AND o.user_id = u.users_id
+    GROUP BY u.users_id
+    ORDER BY u.users_name
+");
+
+$clients = [];
+while ($row = $clientsResult->fetchArray(SQLITE3_ASSOC)) {
+    $clients[] = $row;
+}
+
+// Fetch freelancers data
+$freelancersResult = $db->query("
+    SELECT 
+        f.id,
+        f.name,
+        f.username,
+        f.email,
+        f.skills,
+        f.experience,
+        f.availability,
+        f.profile_picture,
+        f.tagline,
+        f.about_me,
+        f.degree,
+        f.institute,
+        f.graduation_year,
+        f.languages,
+        f.contact,
+        (SELECT COUNT(*) FROM orders WHERE freelancer_id = f.id AND status = 'Completed') AS jobs_completed,
+        (SELECT AVG(rating) FROM ratings WHERE freelancer_id = f.id) AS rating,
+        COALESCE(f.earnings, 0) AS earnings
+    FROM freelancers f
+    ORDER BY f.name
+");
+
+$freelancers = [];
+while ($row = $freelancersResult->fetchArray(SQLITE3_ASSOC)) {
+    $freelancers[] = $row;
+}
+
+// Fetch active jobs data
+$activeJobsResult = $db->query("
+    SELECT 
+        o.id AS order_id,
+        j.job_title AS job_title,
+        u.users_name AS client_name,
+        j.budget,
+        (SELECT COUNT(*) FROM proposals WHERE job_id = j.id) AS proposals,
+        j.deadline,
+        o.status
+    FROM orders o
+    JOIN jobs j ON o.job_id = j.id
+    JOIN users u ON o.user_id = u.users_id
+    WHERE o.status IN ('Open', 'Bidding', 'In Progress')
+    ORDER BY j.posted_date DESC
+");
+
+$activeJobs = [];
+while ($row = $activeJobsResult->fetchArray(SQLITE3_ASSOC)) {
+    $activeJobs[] = $row;
+}
+
+// Fetch job history data
+$jobHistoryResult = $db->query("
+    SELECT 
+        o.id AS order_id,
+        j.job_title AS job_title,
+        o.status,
+        u.users_name AS client_name,
+        f.name AS freelancer_name,
+        o.amount,
+        o.platform_fee AS commission,
+        o.completed_at
+    FROM orders o
+    JOIN jobs j ON o.job_id = j.id
+    LEFT JOIN freelancers f ON o.freelancer_id = f.id
+    JOIN users u ON o.user_id = u.users_id
+    WHERE o.status = 'Submitted'
+    ORDER BY o.completed_at DESC
+");
+
+$jobHistory = [];
+while ($row = $jobHistoryResult->fetchArray(SQLITE3_ASSOC)) {
+    $jobHistory[] = $row;
+}
+
+// Fetch financial data
+$totalPayments = $db->querySingle("SELECT SUM(amount) FROM clientspayments") ?: 0;
+$platformRevenue = $db->querySingle("SELECT SUM(amount) FROM revenue") ?: 0;
+
+
+// Client payments - UPDATED WITH JOINS
+$clientPaymentsResult = $db->query("
+    SELECT 
+        cp.id,
+        u.users_name AS client_name,  
+        j.job_title,
+        cp.amount,
+        cp.payment_date,
+        cp.status
+    FROM clientspayments cp
+    JOIN users u ON cp.client_id = u.users_id
+    JOIN jobs j ON cp.job_id = j.id
+    ORDER BY cp.payment_date DESC
+    LIMIT 50
+");
+$clientPayments = [];
+while ($row = $clientPaymentsResult->fetchArray(SQLITE3_ASSOC)) {
+    $clientPayments[] = $row;
+}
+
+// Freelancer payouts
+$freelancerPayoutsResult = $db->query("
+    SELECT 
+        ws.id as submission_id,
+        f.name as freelancer_name,
+        f.id as freelancer_id,
+        j.job_title as job_title,
+        u.users_name as client_name,
+        o.amount,
+        ws.status
+    FROM work_submissions ws
+    JOIN orders o ON ws.order_id = o.id
+    JOIN freelancers f ON ws.freelancer_id = f.id
+    JOIN jobs j ON ws.job_id = j.id
+    JOIN users u ON o.user_id = u.users_id
+    WHERE ws.status IN ('Approved', 'Paid')
+    ORDER BY ws.submission_date DESC
+");
+
+$freelancerPayouts = [];
+while ($row = $freelancerPayoutsResult->fetchArray(SQLITE3_ASSOC)) {
+    $freelancerPayouts[] = $row;
+}
+
+// Process payout if requested
+if (isset($_POST['process_payout'])) {
+    $submissionId = $_POST['submission_id'];
+    $amount = $_POST['amount'];
+    
+    $db->exec('BEGIN TRANSACTION');
+    
+    try {
+        // Update work submission status to Paid
+        $stmt = $db->prepare("UPDATE work_submissions SET status = 'Paid' WHERE id = ?");
+        $stmt->bindValue(1, $submissionId, SQLITE3_INTEGER);
+        $stmt->execute();
+
+        // Get freelancer_id from submission
+        $freelancerId = $db->querySingle("SELECT freelancer_id FROM work_submissions WHERE id = $submissionId");
+        if (!$freelancerId) {
+            throw new Exception('Freelancer not found for this submission');
+        }
+
+        // Update freelancer's earnings
+        $stmt = $db->prepare("UPDATE freelancers SET earnings = COALESCE(earnings, 0) + ? WHERE id = ?");
+        $stmt->bindValue(1, $amount, SQLITE3_FLOAT);
+        $stmt->bindValue(2, $freelancerId, SQLITE3_INTEGER);
+        $stmt->execute();
+
+        // Update admin balance
+        $admin_balance = $db->querySingle("SELECT balance FROM admin WHERE username = 'root'");
+        $new_admin_balance = $admin_balance - $amount;
+        if ($new_admin_balance < 0) {
+            throw new Exception('Insufficient platform balance');
+        }
+        $db->exec("UPDATE admin SET balance = $new_admin_balance WHERE username = 'root'");
+
+        // Record transaction
+        $orderId = $db->querySingle("SELECT order_id FROM work_submissions WHERE id = $submissionId");
+        $stmt = $db->prepare("INSERT INTO transactions (order_id, freelancer_id, amount, transaction_date, status) VALUES (?, ?, ?, datetime('now'), 'completed')");
+        $stmt->bindValue(1, $orderId, SQLITE3_INTEGER);
+        $stmt->bindValue(2, $freelancerId, SQLITE3_INTEGER);
+        $stmt->bindValue(3, $amount, SQLITE3_FLOAT);
+        $stmt->execute();
+
+        $db->exec('COMMIT');
+        
+        // Refresh the page to show updated data
+        header("Location: admin.php");
+        exit();
+    } catch (Exception $e) {
+        $db->exec('ROLLBACK');
+        $error = $e->getMessage();
+    }
+}
+
+
+if (isset($_POST['process_payout'])) {
+    // Debug: Log initial POST data
+    error_log("Payout initiated - POST data: " . print_r($_POST, true));
+    
+    $submissionId = $_POST['submission_id'];
+    $amount = floatval($_POST['amount']);
+    $freelancerId = $_POST['freelancer_id'];
+    
+    // Debug: Validate inputs
+    error_log("Processing payout - Submission ID: $submissionId, Amount: $amount, Freelancer ID: $freelancerId");
+    
+    if ($amount <= 0) {
+        error_log("Invalid amount: $amount");
+        die("Invalid payment amount");
+    }
+
+    $db->exec('BEGIN TRANSACTION');
+    try {
+        // Debug: Check current freelancer balance
+        $freelancerBefore = $db->querySingle("SELECT earnings, pending_payments FROM freelancers WHERE id = $freelancerId", true);
+        error_log("Freelancer before payment: " . print_r($freelancerBefore, true));
+        
+        // Debug: Check admin balance before
+        $adminBefore = $db->querySingle("SELECT balance FROM admin WHERE username = 'root'");
+        error_log("Admin balance before: $adminBefore");
+
+        // 1. Update work submission status
+        $stmt = $db->prepare("UPDATE work_submissions SET status = 'Paid' WHERE id = ?");
+        $stmt->bindValue(1, $submissionId, SQLITE3_INTEGER);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to update work submission: " . $db->lastErrorMsg());
+        }
+        error_log("Work submission $submissionId marked as Paid");
+
+        // 2. Update freelancer's earnings
+        $stmt = $db->prepare("UPDATE freelancers SET 
+            earnings = earnings + ?,
+            pending_payments = pending_payments - ? 
+            WHERE id = ?");
+        $stmt->bindValue(1, $amount, SQLITE3_FLOAT);
+        $stmt->bindValue(2, $amount, SQLITE3_FLOAT);
+        $stmt->bindValue(3, $freelancerId, SQLITE3_INTEGER);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to update freelancer: " . $db->lastErrorMsg());
+        }
+        
+        // Debug: Verify freelancer update
+        $freelancerAfter = $db->querySingle("SELECT earnings, pending_payments FROM freelancers WHERE id = $freelancerId", true);
+        error_log("Freelancer after payment: " . print_r($freelancerAfter, true));
+
+        // 3. Deduct from admin balance
+        $stmt = $db->prepare("UPDATE admin SET balance = balance - ? WHERE username = 'root'");
+        $stmt->bindValue(1, $amount, SQLITE3_FLOAT);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to update admin balance: " . $db->lastErrorMsg());
+        }
+        
+        // Debug: Verify admin update
+        $adminAfter = $db->querySingle("SELECT balance FROM admin WHERE username = 'root'");
+        error_log("Admin balance after: $adminAfter");
+
+        // 4. Record transaction
+        $stmt = $db->prepare("INSERT INTO transactions (
+            freelancer_id, 
+            amount, 
+            type, 
+            status
+        ) VALUES (?, ?, 'payout', 'completed')");
+        $stmt->bindValue(1, $freelancerId, SQLITE3_INTEGER);
+        $stmt->bindValue(2, $amount, SQLITE3_FLOAT);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to record transaction: " . $db->lastErrorMsg());
+        }
+        $transactionId = $db->lastInsertRowID();
+        error_log("Transaction recorded - ID: $transactionId");
+
+        $db->exec('COMMIT');
+        error_log("Payout completed successfully");
+        
+        // Debug output for browser (remove in production)
+        echo "<script>console.log('Payout processed successfully');</script>";
+        
+        header("Location: admin.php?section=financial&payout=success&txid=$transactionId");
+        exit;
+        
+    } catch (Exception $e) {
+        $db->exec('ROLLBACK');
+        error_log("Payout ERROR: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
+        
+        // Debug output for browser (remove in production)
+        echo "<script>console.error('Payout failed: " . addslashes($e->getMessage()) . "');</script>";
+        
+        $error = "Payout failed: " . $e->getMessage();
+        
+        // Store error in session for display after redirect
+        $_SESSION['payout_error'] = $error;
+        header("Location: admin.php?section=financial&payout=error");
+        exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -209,7 +546,7 @@
             <div class="col-6 col-xl-3">
                 <div class="stat-card animate-card">
                     <h5 class="text-muted mb-3">Total Users</h5>
-                    <h2 class="text-primary fw-bold" id="totalUsers">0</h2>
+                    <h2 class="text-primary fw-bold"><?= $totalUsers ?></h2>
                     <div class="d-flex justify-content-between text-muted">
                         <small>Last 7 days</small>
                     </div>
@@ -218,7 +555,7 @@
             <div class="col-6 col-xl-3">
                 <div class="stat-card animate-card">
                     <h5 class="text-muted mb-3">Total Platform Revenue</h5>
-                    <h2 class="text-success fw-bold" id="totalRevenue">$0.00</h2>
+                    <h2 class="text-success fw-bold">$<?= number_format($totalPlatformRevenue, 2) ?></h2>
                     <div class="d-flex justify-content-between text-muted">
                         <small>This month</small>
                     </div>
@@ -227,7 +564,7 @@
             <div class="col-6 col-xl-3">
                 <div class="stat-card animate-card">
                     <h5 class="text-muted mb-3">Total Freelancer Earnings</h5>
-                    <h2 class="text-warning fw-bold" id="totalFreelancerEarnings">$0.00</h2>
+                    <h2 class="text-warning fw-bold">$<?= number_format($totalFreelancerEarnings, 2) ?></h2>
                     <div class="d-flex justify-content-between text-muted">
                         <small>This month</small>
                     </div>
@@ -236,7 +573,7 @@
             <div class="col-6 col-xl-3">
                 <div class="stat-card animate-card">
                     <h5 class="text-muted mb-3">Total Jobs Completed</h5>
-                    <h2 class="text-info fw-bold" id="totalJobsCompleted">0</h2>
+                    <h2 class="text-info fw-bold"><?= $totalJobsCompleted ?></h2>
                     <div class="d-flex justify-content-between text-muted">
                         <small>This month</small>
                     </div>
@@ -280,8 +617,28 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="clientsTableBody">
-                            <!-- Data will be populated here -->
+                        <tbody>
+                            <?php foreach ($clients as $client): ?>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="avatar.png" class="rounded-circle me-2" width="35" height="35">
+                                        <?= htmlspecialchars($client['users_name']) ?>
+                                    </div>
+                                </td>
+                                <td><?= htmlspecialchars($client['joined_date']) ?></td>
+                                <td><?= htmlspecialchars($client['jobs_posted']) ?></td>
+                                <td>$<?= number_format($client['total_spent'], 2) ?></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-comment-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -306,8 +663,29 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="freelancersTableBody">
-                            <!-- Data will be populated here -->
+                        <tbody>
+                            <?php foreach ($freelancers as $freelancer): ?>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="avatar.png" class="rounded-circle me-2" width="35" height="35">
+                                        <?= htmlspecialchars($freelancer['name']) ?>
+                                    </div>
+                                </td>
+                                <td><?= htmlspecialchars($freelancer['skills']) ?></td>
+                                <td><span class="text-warning"><i class="fas fa-star"></i> <?= number_format($freelancer['rating'] ?? 0, 1) ?></span></td>
+                                <td><?= htmlspecialchars($freelancer['jobs_completed']) ?></td>
+                                <td>$<?= number_format($freelancer['earnings'], 2) ?></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-comment-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -335,8 +713,17 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="activeJobsBody">
-                            <!-- Data will be populated here -->
+                        <tbody>
+                            <?php foreach ($activeJobs as $job): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($job['job_title']) ?></td>
+                                <td><?= htmlspecialchars($job['client_name']) ?></td>
+                                <td>$<?= number_format($job['budget'], 2) ?></td>
+                                <td><?= htmlspecialchars($job['proposals']) ?></td>
+                                <td><?= date('M d, Y', strtotime($job['deadline'])) ?></td>
+                                <td><span class="status-badge <?= getStatusClass($job['status']) ?>"><?= htmlspecialchars($job['status']) ?></span></td>
+                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -362,8 +749,18 @@
                                 <th>Completed</th>
                             </tr>
                         </thead>
-                        <tbody id="jobHistoryBody">
-                            <!-- Data will be populated here -->
+                        <tbody>
+                            <?php foreach ($jobHistory as $job): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($job['job_title']) ?></td>
+                                <td><span class="status-badge <?= getStatusClass($job['status']) ?>"><?= htmlspecialchars($job['status']) ?></span></td>
+                                <td><?= htmlspecialchars($job['client_name']) ?></td>
+                                <td><?= htmlspecialchars($job['freelancer_name']) ?></td>
+                                <td>$<?= number_format($job['amount'], 2) ?></td>
+                                <td>$<?= number_format($job['commission'] ?? 0, 2) ?></td>
+                        <td><?= !empty($job['completed_at']) ? date('M d, Y', strtotime($job['completed_at'])) : '' ?></td>
+                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -379,12 +776,18 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h4 class="mb-3">Platform Balance</h4>
-                            <h1 class="display-4 fw-bold" id="platformBalance">$0.00</h1>
+                            
+                            <h1 class="display-4 fw-bold">$<?php // Fetch financial data
+    $totalPayments = $db->querySingle("SELECT SUM(amount) FROM clientspayments") ?: 0;
+    $totalPayouts = $db->querySingle("SELECT SUM(amount) FROM transactions WHERE type = 'payout' AND status = 'completed'") ?: 0;
+    $platformBalance = $totalPayments - $totalPayouts;
+    echo $platformBalance ?></h1>
+                            
                             <p class="mb-0">Total payments received</p>
                         </div>
                         <div class="col-md-6">
                             <h4 class="mb-3">Platform Revenue</h4>
-                            <h1 class="display-4 fw-bold" id="platformRevenue">$0.00</h1>
+                            <h1 class="display-4 fw-bold">$<?= number_format($platformRevenue, 2) ?></h1>
                             <p class="mb-0">20% commission from all payments</p>
                         </div>
                     </div>
@@ -443,16 +846,21 @@
                                         <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody id="clientPaymentsBody">
-                                    <!-- Client payments data will be populated here -->
+                                <tbody>
+                                    <?php foreach ($clientPayments as $payment): ?>
+                                    <tr>
+                                        <td>#<?= htmlspecialchars($payment['id']) ?></td>
+                                        <td><?= htmlspecialchars($payment['client_name']) ?></td>
+                                        <td><?= htmlspecialchars($payment['job_title']) ?></td>
+                                        <td>$<?= number_format($payment['amount'], 2) ?></td>
+                                        <td>$<?= number_format($payment['amount'] * 0.2, 2) ?></td>
+                                        <td><?= date('M d, Y', strtotime($payment['payment_date'])) ?></td>
+                                        <td><span class="status-badge bg-success">Paid</span></td>
+                                    </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
-                        <nav aria-label="Client payments pagination">
-                            <ul class="pagination justify-content-center mt-3" id="clientPaymentsPagination">
-                                <!-- Pagination will be added here -->
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>
@@ -498,16 +906,40 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="freelancerPayoutsBody">
-                                    <!-- Freelancer payouts data will be populated here -->
+                                <tbody>
+                                    <?php foreach ($freelancerPayouts as $payout): 
+                                        $platformFee = $payout['amount'] * 0.15;
+                                        $payoutAmount = $payout['amount'] - $platformFee;
+                                        $statusBadge = $payout['status'] === 'Approved' ? 'bg-warning' : 
+                                                     ($payout['status'] === 'Paid' ? 'bg-success' : 'bg-secondary');
+                                    ?>
+                                    <tr>
+                                        <td>#<?= htmlspecialchars($payout['submission_id']) ?></td>
+                                        <td><?= htmlspecialchars($payout['freelancer_name']) ?></td>
+                                        <td><?= htmlspecialchars($payout['job_title']) ?></td>
+                                        <td><?= htmlspecialchars($payout['client_name']) ?></td>
+                                        <td>$<?= number_format($payout['amount'], 2) ?></td>
+                                        <td>$<?= number_format($platformFee, 2) ?></td>
+                                        <td>$<?= number_format($payoutAmount, 2) ?></td>
+                                        <td><span class="status-badge <?= $statusBadge ?>"><?= htmlspecialchars($payout['status']) ?></span></td>
+                                        <td>
+                                            <?php if ($payout['status'] === 'Approved'): ?>
+                                                <form method="post" onsubmit="return confirm('Confirm payout of $<?= number_format($payoutAmount, 2) ?>?')">
+                                                    <input type="hidden" name="process_payout" value="1">
+                                                    <input type="hidden" name="submission_id" value="<?= $payout['submission_id'] ?>">
+                                                    <input type="hidden" name="amount" value="<?= $payoutAmount ?>">
+                                                    <input type="hidden" name="freelancer_id" value="<?= $payout['freelancer_id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-success payment-btn">
+                                                        <i class="fas fa-money-bill-wave me-2"></i>Pay Now
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
-                        <nav aria-label="Freelancer payouts pagination">
-                            <ul class="pagination justify-content-center mt-3" id="freelancerPayoutsPagination">
-                                <!-- Pagination will be added here -->
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>
@@ -520,265 +952,68 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Fetch dashboard data
-    fetch('admin_handle.php')
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                console.error(data.error);
-                return;
-            }
-
-            // Update Total Users
-            document.getElementById('totalUsers').textContent = data.totalUsers;
-            
-            // Update Total Platform Revenue
-            document.getElementById('totalRevenue').textContent = '$' + data.totalPlatformRevenue.toFixed(2);
-            
-            // Update Total Freelancer Earnings
-            document.getElementById('totalFreelancerEarnings').textContent = '$' + data.totalFreelancerEarnings.toFixed(2);
-            
-            // Update Total Jobs Completed
-            document.getElementById('totalJobsCompleted').textContent = data.totalJobsCompleted;
-
-            // Initialize Platform Growth Chart
-            const growthChart = new Chart(document.getElementById('growthChart'), {
-                type: 'line',
-                data: {
-                    labels: data.growthChartLabels,
-                    datasets: [{
-                        label: 'New Users',
-                        data: data.growthChartData,
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#6366f1',
-                        pointHoverRadius: 7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#e2e8f0'
-                            },
-                            title: {
-                                display: true,
-                                text: 'New Users'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            title: {
-                                display: true,
-                                text: 'Weeks'
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#334155',
-                            borderWidth: 1,
-                            padding: 12
-                        },
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Initialize User Distribution Chart with dynamic data
-            const userDistribution = new Chart(document.getElementById('userDistribution'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Freelancers', 'Clients'],
-                    datasets: [{
-                        data: [data.freelancers, data.clients],
-                        backgroundColor: ['#6366f1', '#10b981'],
-                        borderWidth: 0,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#334155',
-                            borderWidth: 1,
-                            padding: 12
-                        }
-                    },
-                    cutout: '70%'
-                }
-            });
-        })
-        .catch(error => console.error('Error:', error));
-
-    // Fetch and populate client data
-    function fetchClients() {
-        fetch('admin_handle.php?action=getClients')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) return;
-
-                const tbody = document.getElementById('clientsTableBody');
-                tbody.innerHTML = '';
-
-                data.clients.forEach(client => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="avatar.png" class="rounded-circle me-2" width="35" height="35">
-                                    ${client.users_name}
-                                </div>
-                            </td>
-                            <td>${client.joined_date}</td>
-                            <td>${client.jobs_posted}</td>
-                            <td>$${client.total_spent}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary me-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-success">
-                                    <i class="fas fa-comment-alt"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
-    }
-
-    // Fetch and populate freelancer data
-    function fetchFreelancers() {
-        fetch('admin_handle.php?action=getFreelancers')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) return;
-
-                const tbody = document.getElementById('freelancersTableBody');
-                tbody.innerHTML = '';
-
-                data.freelancers.forEach(freelancer => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="avatar.png" class="rounded-circle me-2" width="35" height="35">
-                                    ${freelancer.name}
-                                </div>
-                            </td>
-                            <td>${freelancer.skills}</td>
-                            <td><span class="text-warning"><i class="fas fa-star"></i> ${freelancer.rating}</span></td>
-                            <td>${freelancer.jobs_completed}</td>
-                            <td>$${freelancer.earnings}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary me-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-success">
-                                    <i class="fas fa-comment-alt"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
-    }
-
-    // Fetch and populate active jobs data
-    function fetchActiveJobs() {
-        fetch('admin_handle.php?action=getActiveJobs')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) return;
-
-                const tbody = document.getElementById('activeJobsBody');
-                tbody.innerHTML = '';
-
-                data.activeJobs.forEach(job => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${job.job_title}</td>
-                            <td>${job.client_name || 'N/A'}</td>
-                            <td>$${job.budget}</td>
-                            <td>${job.proposals}</td>
-                            <td>${new Date(job.deadline).toLocaleDateString()}</td>
-                            <td><span class="status-badge ${getStatusClass(job.status)}">${job.status}</span></td>
-                        </tr>
-                    `;
-                });
-            });
-    }
-
-    // Fetch and populate job history data
-    function fetchJobHistory() {
-        fetch('admin_handle.php?action=getJobHistory')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) return;
-
-                const tbody = document.getElementById('jobHistoryBody');
-                tbody.innerHTML = '';
-
-                data.jobHistory.forEach(job => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${job.job_title}</td>
-                            <td><span class="status-badge ${getStatusClass(job.status)}">${job.status}</span></td>
-                            <td>${job.client_name}</td>
-                            <td>${job.freelancer_name}</td>
-                            <td>$${job.amount}</td>
-                            <td>$${job.commission}</td>
-                            <td>${new Date(job.completed_at).toLocaleDateString()}</td>
-                        </tr>
-                    `;
-                });
-            });
-    }
-
-    // Helper function to get status badge class
-    function getStatusClass(status) {
-        switch (status.toLowerCase()) {
-            case 'open': return 'bg-primary';
-            case 'bidding': return 'bg-warning';
-            case 'in progress': return 'bg-info';
-            case 'submitted': return 'bg-success';
-            default: return 'bg-secondary';
+    // Initialize Platform Growth Chart
+    const revenueChart = new Chart(document.getElementById('growthChart'), {
+    type: 'line',
+    data: {
+        labels: <?= json_encode(array_reverse($revenueLabels)) ?>,
+        datasets: [{
+            label: 'Platform Revenue',
+            data: <?= json_encode(array_reverse($revenueData)) ?>,
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: { display: true, text: 'Revenue ($)' }
+            },
+            x: { title: { display: true, text: 'Weeks' } }
         }
     }
+});
+
+    // Initialize User Distribution Chart with dynamic data
+    const userDistribution = new Chart(document.getElementById('userDistribution'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Freelancers', 'Clients'],
+            datasets: [{
+                data: [<?= $freelancerCount ?>, <?= $clientCount ?>],
+                backgroundColor: ['#6366f1', '#10b981'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12
+                }
+            },
+            cutout: '70%'
+        }
+    });
 
     function showSection(sectionId) {
         // Remove 'active' class from all nav links
@@ -799,17 +1034,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (id === sectionId) {
                     element.classList.remove('hidden');
                     element.classList.add('animate__animated', 'animate__fadeIn');
-
-                    // Load data when section becomes visible
-                    if (id === 'users') {
-                        fetchClients();
-                        fetchFreelancers();
-                    } else if (id === 'jobs') {
-                        fetchActiveJobs();
-                        fetchJobHistory();
-                    } else if (id === 'financial') {
-                        fetchFinancialData();
-                    }
                 } else {
                     element.classList.add('hidden');
                 }
@@ -843,102 +1067,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Fetch financial data
-function fetchFinancialData() {
-    fetch('admin_handle.php?action=getFinancialData')
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                console.error(data.error);
-                return;
-            }
-
-            // Update platform balance and revenue
-            document.getElementById('platformBalance').textContent = '$' + data.total_payments.toFixed(2);
-            document.getElementById('platformRevenue').textContent = '$' + data.platform_revenue.toFixed(2);
-
-            // Populate client payments table
-            const clientPaymentsBody = document.getElementById('clientPaymentsBody');
-            clientPaymentsBody.innerHTML = '';
-            
-            data.client_payments.forEach(payment => {
-                const platformFee = payment.amount * 0.2;
-                clientPaymentsBody.innerHTML += `
-                    <tr>
-                        <td>#${payment.id}</td>
-                        <td>${payment.client_name}</td>
-                        <td>${payment.job_title}</td>
-                        <td>$${payment.amount.toFixed(2)}</td>
-                        <td>$${platformFee.toFixed(2)}</td>
-                        <td>${new Date(payment.payment_date).toLocaleDateString()}</td>
-                        <td><span class="status-badge bg-success">Paid</span></td>
-                    </tr>
-                `;
-            });
-
-            // Populate freelancer payouts table
-            const freelancerPayoutsBody = document.getElementById('freelancerPayoutsBody');
-            freelancerPayoutsBody.innerHTML = '';
-            
-            data.freelancer_payouts.forEach(payout => {
-                const platformFee = payout.amount * 0.15;
-                const payoutAmount = payout.amount - platformFee;
-                const statusBadge = payout.status === 'Approved' ? 'bg-warning' : 
-                                   payout.status === 'Paid' ? 'bg-success' : 'bg-secondary';
-                
-                freelancerPayoutsBody.innerHTML += `
-                    <tr>
-                        <td>#${payout.submission_id}</td>
-                        <td>${payout.freelancer_name}</td>
-                        <td>${payout.job_title}</td>
-                        <td>${payout.client_name}</td>
-                        <td>$${payout.amount.toFixed(2)}</td>
-                        <td>$${platformFee.toFixed(2)}</td>
-                        <td>$${payoutAmount.toFixed(2)}</td>
-                        <td><span class="status-badge ${statusBadge}">${payout.status}</span></td>
-                        <td>
-                            ${payout.status === 'Approved' ? `
-                            <button class="btn btn-sm btn-success payment-btn" onclick="processPayout(${payout.submission_id}, ${payoutAmount})">
-                                <i class="fas fa-money-bill-wave me-2"></i>Pay Now
-                            </button>` : ''}
-                        </td>
-                    </tr>
-                `;
-            });
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-// Process payout to freelancer
-function processPayout(submissionId, amount) {
-    if (!confirm(`Are you sure you want to process this payout of $${amount.toFixed(2)}?`)) {
-        return;
+<?php
+function getStatusClass($status) {
+    switch (strtolower($status)) {
+        case 'open': return 'bg-primary';
+        case 'bidding': return 'bg-warning';
+        case 'in progress': return 'bg-info';
+        case 'submitted': return 'bg-success';
+        default: return 'bg-secondary';
     }
-
-    fetch('admin_handle.php?action=processPayout', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            submission_id: submissionId,
-            amount: amount
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Payout processed successfully!');
-            fetchFinancialData(); // Refresh the data
-        } else {
-            alert('Error processing payout: ' + data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while processing the payout.');
-    });
 }
+?>
 </script>
 </body>
 </html>
