@@ -132,11 +132,19 @@ $jobs = fetchJobs($db, $filters);
             --text-primary: rgba(0, 0, 0, 0.644);
             --text-hover: #000000;
             --bg-light: whitesmoke;
-            --bg-white: #fff;
+            --bg-white: whitesmoke;
             --gray-icon: #c9d1d9;
             --button-hover: rgb(81, 81, 81);
             --section-padding: 80px 5%;
             --shoe-color: #4B3621;
+            --status-open: #28a745;
+            --status-completed: #6c757d;
+            --status-inprogress: #17a2b8;
+            --status-cancelled: #dc3545;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.05);
+            --card-border: 1px solid rgba(0, 0, 0, 0.08);
+            --card-hover-border: 1px solid rgba(32, 159, 75, 0.3);
         }
 
         * {
@@ -154,116 +162,78 @@ $jobs = fetchJobs($db, $filters);
             flex-direction: column;
             min-height: 100vh;
         }
-/* Navigation */
-nav {
+
+        /* Navbar */
+        .navbar {
             background-color: var(--bg-white);
-            border-radius: 12px;
-            padding: 20px 40px;
-            margin: 20px auto;
-            width: 1480px;
+            padding: 0 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin: 10px 15px 5px 15px;
+            border-radius: 12px;
+            height: 70px;
         }
-        
-        .logo img {
-            height: 50px;
-            transition: transform 0.3s ease;
-        }
-        
-        .logo img:hover {
-            transform: translateY(-3px);
-        }
-        
-        .nav-menu {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-menu li {
-            margin: 0 15px;
-        }
-        
-        .nav-menu a {
-            text-decoration: none;
-            color: var(--text-primary);
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .nav-menu a:hover {
-            color: var(--text-hover);
-        }
-        
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background-color: var(--accent-green);
-            transition: width 0.3s ease;
-        }
-        
-        .nav-menu a:hover::after {
+
+        .navbar-container {
             width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .nav-btns {
+
+        .navbar-brand {
             display: flex;
             align-items: center;
-            gap: 15px;
-        }
-        
-        .btn-login {
-            font-weight: 600;
-            font-size: 1rem;
-            background: transparent;
-            color: var(--text-primary);
-            border: none;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-login:hover {
-            color: var(--text-hover);
-            background-color: rgba(0,0,0,0.05);
-        }
-        
-        .btn-register {
-            background: var(--primary-dark);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .btn-register:hover {
-            background: var(--button-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-        
-        .menu-icon {
-            display: none;
+            gap: 12px;
+            font-weight: 700;
             font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray-icon);
+            color: var(--primary-dark);
+            text-decoration: none;
         }
-        
+
+        .navbar-brand img {
+            height: 40px;
+        }
+
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--text-hover);
+        }
+
+        .nav-btn {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
         /* Search Section */
         .search-section {
-            background-color: var(--bg-light);
+            background-color: var(--bg-white);
             padding: 40px 5%;
             margin: 15px;
             border-radius: 12px;
@@ -298,7 +268,6 @@ nav {
             margin: 30px auto 0;
             position: relative;
             display: flex;
-           
             align-items: center;
         }
 
@@ -308,7 +277,6 @@ nav {
             border-radius: 50px;
             border: 1px solid rgba(0,0,0,0.1);
             font-size: 1rem;
-           
             transition: all 0.3s;
             font-family: 'Poppins', sans-serif;
             flex-grow: 1;
@@ -322,7 +290,7 @@ nav {
 
         .search-btn {
             position: absolute;
-            right: 70px;
+            right: 140px;
             top: 50%;
             transform: translateY(-50%);
             padding: 10px 25px;
@@ -522,58 +490,122 @@ nav {
         .job-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding: 0 20px;
-            align-content: start;
+            gap: 15px;
+            padding: 0 15px;
         }
 
         .job-card {
             background: var(--bg-white);
             border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
+            padding: 20px;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+            border: var(--card-border);
             display: flex;
             flex-direction: column;
-            min-height: 260px;
+            min-height: 280px;
+            position: relative;
+            overflow: hidden;
         }
 
         .job-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: var(--card-hover-shadow);
+            border-color: var(--card-hover-border);
         }
 
         .job-card h3 {
             color: var(--primary-dark);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 1.25rem;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .job-card .client-name {
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .job-card .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .job-card .badge {
             font-weight: 500;
-            padding: 5px 10px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .job-card .badge-category {
+            background-color: #e9f5ff;
+            color: #0066cc;
+        }
+
+        .job-card .badge-experience {
+            background-color: #fff4e5;
+            color: #ff6b00;
         }
 
         .job-card .salary {
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--accent-green);
-            margin: 10px 0;
+            margin: 10px 0 15px;
+        }
+
+        .job-card .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .job-card .status-open {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--status-open);
+        }
+
+        .job-card .status-completed {
+            background-color: rgba(108, 117, 125, 0.2);
+            color: var(--status-completed);
+        }
+
+        .job-card .status-inprogress {
+            background-color: rgba(23, 162, 184, 0.2);
+            color: var(--status-inprogress);
+        }
+
+        .job-card .status-cancelled {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--status-cancelled);
         }
 
         .job-meta {
             display: flex;
             justify-content: space-between;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-primary);
             margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0,0,0,0.05);
         }
 
         .make-proposal-btn {
             margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             background: var(--primary-dark);
             color: white;
             border: none;
@@ -581,6 +613,7 @@ nav {
             transition: all 0.3s;
             font-weight: 600;
             text-align: center;
+            font-size: 0.9rem;
         }
 
         .make-proposal-btn:hover {
@@ -745,7 +778,7 @@ nav {
             }
             
             .search-btn {
-                right: 70px;
+                right: 120px;
                 padding: 10px 15px;
             }
             
@@ -773,6 +806,17 @@ nav {
                 font-size: 1.8rem;
             }
             
+            .search-btn {
+                right: 100px;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .filter-btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
             .modal-content {
                 width: 95%;
                 margin: 40px auto 20px;
@@ -781,31 +825,19 @@ nav {
     </style>
 </head>
 <body>
-<nav>
-        <div class="logo">
-            <img src="../Assets/logo2.png" alt="Freelance Marketplace Logo">
-        </div>
-        
-        <ul class="nav-menu">
-            <li><a href="#howitworks">How it Works</a></li>
-            <li><a href="../PHPUIFiles/Find-Job.php">Find Work</a></li>
-            <li><a href="../PHPUIFiles/about-us.php">About Us</a></li>
-            <li><a href="../PHPUIFiles/contact-us.php">Contact Us</a></li>
-        </ul>
-        
-        <div class="nav-btns">
-            <a href="PHPUIFiles/login.php">
-                <button class="btn-login">Login</button>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a class="navbar-brand" href="../index.php">
+                <img src="../Assets/logo2.png" alt="CodeBrains Logo">
             </a>
-            <a href="../PHPUIFiles/register.php">
-                <button class="btn-register">Register</button>
-            </a>
+            <ul class="navbar-nav">
+                <li><a class="nav-link" href="../index.php">Home</a></li>
+                <li><a class="nav-link" href="#my-jobs">My Jobs</a></li>
+                <li><a class="nav-link" href="#messages">Messages</a></li>
+                <li><a class="nav-btn" href="#logout">Logout</a></li>
+            </ul>
         </div>
-        
-        <div class="menu-icon">
-            <i class="fas fa-bars"></i>
-        </div>
-</nav>
+    </nav>
 
     <section class="search-section">
         <h1>Find Your <span>Perfect</span> Job Match</h1>
@@ -925,20 +957,16 @@ nav {
             <?php if (count($jobs) > 0): ?>
                 <?php foreach ($jobs as $job): ?>
                     <div class="job-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <h3><?= htmlspecialchars($job['title']) ?></h3>
-                            <span class="badge <?= $job['status'] === 'Open' ? 'bg-success' : 'bg-danger' ?>">
-                                <?= htmlspecialchars($job['status']) ?>
-                            </span>
-                        </div>
-                        <p style="color: var(--text-primary); margin-bottom: 10px;"><?= htmlspecialchars($job['username']) ?></p>
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <span class="badge bg-primary"><?= htmlspecialchars($job['category']) ?></span>
-                            <span class="badge bg-warning text-dark"><?= htmlspecialchars($job['experience']) ?></span>
+                        <span class="status-badge status-<?= strtolower($job['status']) ?>"><?= htmlspecialchars($job['status']) ?></span>
+                        <h3><?= htmlspecialchars($job['title']) ?></h3>
+                        <p class="client-name"><?= htmlspecialchars($job['username']) ?></p>
+                        <div class="badge-container">
+                            <span class="badge badge-category"><?= htmlspecialchars($job['category']) ?></span>
+                            <span class="badge badge-experience"><?= htmlspecialchars($job['experience']) ?></span>
                         </div>
                         <p class="salary">$<?= number_format($job['budget'], 2) ?></p>
                         <div class="job-meta">
-                            <span>Posted <?= htmlspecialchars($job['posted_ago']) ?></span>
+                            <span><?= htmlspecialchars($job['posted_ago']) ?></span>
                             <span>Deadline: <?= htmlspecialchars($job['deadline']) ?></span>
                         </div>
                         <button class="make-proposal-btn" data-job-id="<?= $job['id'] ?>">
