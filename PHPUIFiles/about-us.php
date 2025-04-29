@@ -490,31 +490,31 @@
             <div class="team-member">
                 <img src="team1.jpg" alt="Omkar Patil">
                 <h4>Omkar Patil</h4>
-                <p>CEO & Founder</p>
+               
             </div>
             
             <div class="team-member">
                 <img src="team2.jpg" alt="Atharv Kulkarni">
                 <h4>Atharv Kulkarni</h4>
-                <p>CTO</p>
+            
             </div>
             
             <div class="team-member">
                 <img src="team3.jpg" alt="Samarth Patil">
                 <h4>Samarth Patil</h4>
-                <p>Lead Developer</p>
+          
             </div>
             
             <div class="team-member">
                 <img src="team4.jpg" alt="Rushikesh Yadav">
                 <h4>Rushikesh Yadav</h4>
-                <p>UX Designer</p>
+            
             </div>
             
             <div class="team-member">
                 <img src="team5.jpg" alt="Vivek Dalvi">
                 <h4>Vivek Dalvi</h4>
-                <p>Marketing Director</p>
+          
             </div>
         </div>
     </section>

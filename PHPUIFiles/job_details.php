@@ -242,6 +242,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $rating = $_POST['rating'];
             $review = $_POST['review'];
             
+            // Check if platform rating exists
+            $platformRatingQuery = $db->prepare("SELECT rating FROM Platform_Rating 
+                                               WHERE job_id = :job_id AND freelancer_id = :freelancer_id AND client_id = :client_id");
+            $platformRatingQuery->bindValue(':job_id', $job_id, SQLITE3_INTEGER);
+            $platformRatingQuery->bindValue(':freelancer_id', $freelancer_id, SQLITE3_INTEGER);
+            $platformRatingQuery->bindValue(':client_id', $user_id, SQLITE3_INTEGER);
+            $platformRatingResult = $platformRatingQuery->execute();
+            $platformRating = $platformRatingResult->fetchArray(SQLITE3_ASSOC);
+            
             // Insert rating into database
             $stmt = $db->prepare("INSERT INTO ratings (job_id, freelancer_id, client_id, rating, review) 
                                  VALUES (:job_id, :freelancer_id, :client_id, :rating, :review)");
@@ -406,6 +415,7 @@ function format_size($bytes) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../CSS files/job-details.css">
     <style>
         .submission-card {
@@ -473,6 +483,12 @@ function format_size($bytes) {
         }
         .rating-stars .far {
             color: #ddd;
+        }
+        .platform-rating {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -815,6 +831,29 @@ function format_size($bytes) {
                             </div>
                         <?php else: ?>
                             <?php foreach ($submissions as $submission): ?>
+                                <?php
+                                // Check if platform rating exists
+                                $platformRatingQuery = $db->prepare("SELECT * FROM Platform_Rating WHERE job_id = :job_id AND freelancer_id = :freelancer_id AND client_id = :client_id");
+                                $platformRatingQuery->bindValue(':job_id', $job_id, SQLITE3_INTEGER);
+                                $platformRatingQuery->bindValue(':freelancer_id', $submission['freelancer_id'], SQLITE3_INTEGER);
+                                $platformRatingQuery->bindValue(':client_id', $user_id, SQLITE3_INTEGER);
+                                $platformRatingResult = $platformRatingQuery->execute();
+                                $platformRatingExists = $platformRatingResult->fetchArray(SQLITE3_ASSOC);
+
+                                // Get the last submitted file
+                                $lastFile = '';
+                                $fileExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'zip'];
+                                if (!empty($submission['files_path'])) {
+                                    $files = explode(',', $submission['files_path']);
+                                    foreach (array_reverse($files) as $file) {
+                                        $ext = pathinfo($file, PATHINFO_EXTENSION);
+                                        if (in_array(strtolower($ext), $fileExtensions)) {
+                                            $lastFile = $file;
+                                            break;
+                                        }
+                                    }
+                                }
+                                ?>
                                 <div class="col-12">
                                     <div class="card submission-card <?= $submission['status'] == 'Revision Requested' ? 'revision' : 
                                                                      ($submission['status'] == 'Approved' ? 'approved' : '') ?>">
@@ -937,7 +976,8 @@ function format_size($bytes) {
                                                                 <button type="button" class="btn btn-info" data-bs-toggle="modal" 
                                                                         data-bs-target="#ratingModal" 
                                                                         data-submission-id="<?= $submission['id'] ?>"
-                                                                        data-freelancer-id="<?= $submission['freelancer_id'] ?>">
+                                                                        data-freelancer-id="<?= $submission['freelancer_id'] ?>"
+                                                                        data-last-file="<?= htmlspecialchars($lastFile) ?>">
                                                                     <i class="fas fa-star me-2"></i>Rate Freelancer
                                                                 </button>
                                                             <?php else: ?>
@@ -1044,8 +1084,20 @@ function format_size($bytes) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <?php if (!empty($lastFile)): ?>
+                            <div class="platform-rating">
+                                <h6>Automated Rating Given By Platform</h6>
+                                <p class="mb-1">Submitted File: <?= basename($lastFile) ?></p>
+                                <?php if ($platformRatingExists): ?>
+                                    <p>Rating: <?= $platformRatingExists['rating'] ?>/5</p>
+                                <?php else: ?>
+                                    <p>Rating: <span id="platformRatingValue">Calculating...</span>/5</p>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                        
                         <div class="mb-3">
-                            <label class="form-label">Rating</label>
+                            <label class="form-label">Your Rating</label>
                             <div class="rating-stars">
                                 <?php for ($i = 1; $i <= 5; $i++): ?>
                                     <i class="far fa-star rating-star" data-rating="<?= $i ?>"></i>
@@ -1197,8 +1249,19 @@ function format_size($bytes) {
                 const button = event.relatedTarget;
                 const submissionId = button.getAttribute('data-submission-id');
                 const freelancerId = button.getAttribute('data-freelancer-id');
+                const lastFile = button.getAttribute('data-last-file');
+                
                 document.getElementById('ratingSubmissionId').value = submissionId;
                 document.getElementById('ratingFreelancerId').value = freelancerId;
+                
+                // If there's a last file, calculate platform rating
+                if (lastFile) {
+                    // Simulate platform rating calculation (replace with actual API call)
+                    setTimeout(() => {
+                        const platformRating = Math.floor(Math.random() * 3) + 3; // Random rating between 3-5
+                        document.getElementById('platformRatingValue').textContent = platformRating;
+                    }, 500);
+                }
             });
         }
 

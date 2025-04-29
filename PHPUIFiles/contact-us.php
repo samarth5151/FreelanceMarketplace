@@ -416,6 +416,26 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
         
+        /* Alert Messages */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background-color: rgba(32, 159, 75, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(32, 159, 75, 0.3);
+        }
+        
+        .alert-error {
+            background-color: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+        
         /* Responsive Design */
         @media (max-width: 992px) {
             .hero-content h1 {
@@ -505,7 +525,7 @@
             <li><a href="#">How it Works</a></li>
             <li><a href="./Find-Job.php">Find Work</a></li>
             <li><a href="./about-us.php">About Us</a></li>
-            <li><a href="./contact-us.jpg">Contact Us</a></li>
+            <li><a href="./contact-us.php">Contact Us</a></li>
         </ul>
         
         <div class="nav-btns">
@@ -582,25 +602,35 @@
             <!-- Contact Form -->
             <div class="contact-form">
                 <h2>Send Us a Message</h2>
-                <form>
+                <?php
+                // Display success/error messages if they exist
+                if (isset($_GET['status'])) {
+                    if ($_GET['status'] == 'success') {
+                        echo '<div class="alert alert-success">Thank you for your message! We will get back to you soon.</div>';
+                    } elseif ($_GET['status'] == 'error') {
+                        echo '<div class="alert alert-error">There was an error sending your message. Please try again.</div>';
+                    }
+                }
+                ?>
+                <form action="send-contact.php" method="POST">
                     <div class="form-group">
                         <label for="name">Your Name</label>
-                        <input type="text" id="name" class="form-control" placeholder="Enter your name" required>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Enter your name" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="subject">Subject</label>
-                        <input type="text" id="subject" class="form-control" placeholder="What's this about?">
+                        <input type="text" id="subject" name="subject" class="form-control" placeholder="What's this about?">
                     </div>
                     
                     <div class="form-group">
                         <label for="message">Your Message</label>
-                        <textarea id="message" class="form-control" placeholder="How can we help you?" required></textarea>
+                        <textarea id="message" name="message" class="form-control" placeholder="How can we help you?" required></textarea>
                     </div>
                     
                     <button type="submit" class="submit-btn">Send Message</button>
@@ -637,17 +667,6 @@
         // Mobile menu toggle
         document.querySelector('.menu-icon').addEventListener('click', function() {
             document.querySelector('.nav-menu').classList.toggle('active');
-        });
-        
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
         });
     </script>
 </body>
